@@ -43,7 +43,6 @@ def parse_problem(key_value, object_list):
         for attr_name, attr_value in pairs.iteritems():
             dict_objects[attr_name] = attr_value
             dict_objects['name'] = object_name
-            # print attr_name, attr_value
         store_attributes(key_value, dict_objects)
 
 
@@ -52,31 +51,24 @@ def store_attributes(key_value, dict_objects):
         objectlist_4, objectlist_5, objectlist_6
     if key_value == 'A':
         objectlist_A.append(dict_objects)
-        # print objectlist_A
     if key_value == 'B':
         objectlist_B.append(dict_objects)
-        # print objectlist_B
     if key_value == 'C':
         objectlist_C.append(dict_objects)
-        # print objectlist_C
     if key_value == '1':
         objectlist_1.append(dict_objects)
-        # print objectlist_1
     if key_value == '2':
         objectlist_2.append(dict_objects)
-        # print objectlist_2
     if key_value == '3':
         objectlist_3.append(dict_objects)
-        # print objectlist_3
     if key_value == '4':
         objectlist_4.append(dict_objects)
-        # print objectlist_4
     if key_value == '5':
         objectlist_5.append(dict_objects)
-        # print objectlist_5
     if key_value == '6':
         objectlist_6.append(dict_objects)
-        # print objectlist_6
+
+        # Check A & C and apply to B and solution set
 
 
 def find_solution_alternate():
@@ -93,8 +85,8 @@ def find_solution_alternate():
                  'transform': ['add', 'remove']
                  }
 
-    # solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
-    solution_list = [objectlist_3]
+    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
+    # solution_list = [objectlist_3]
     # print objectlist_A
     # print objectlist_C
     # print ""
@@ -125,22 +117,24 @@ def find_solution_alternate():
                     j += 1
         i += 1
 
+    rule_add_count = -1
+    rule_remove_count = -1
     if i > j:
-        for keyA, valueA in iter(sorted(objectlist_A[len(objectlist_A) - 1].items())):
-            if keyA != 'name':
-                if valueA not in ref_rules[keyA]:
-                    ref_rules[keyA].append(valueA)
-                rule_diff[i - 1][keyA] = ref_rules[keyA].index(valueA) - 0
+        rule_remove_count = i - j
+        for itr in range(j, i):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'remove'
 
     if i < j:
-        for keyC, valueC in iter(sorted(objectlist_C[len(objectlist_C) - 1].items())):
-            if keyC != 'name':
-                if valueC not in ref_rules[keyC]:
-                    ref_rules[keyC].append(valueC)
-                rule_diff[j - 1][keyC] = ref_rules[keyC].index(valueC) - 0
+        rule_add_count = j - i
+        for itr in range(i, j):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'add'
 
-                # for index in range(len(rule_diff)):
-                # print rule_diff[index]
+    # for index in range(len(rule_diff)):
+    # print rule_diff[index]
     # print ""
     solution_index = 0
 
@@ -176,36 +170,42 @@ def find_solution_alternate():
                         j += 1
             i += 1
 
+        temprule_add_count = -1
+        temprule_remove_count = -1
         if i > j:
-            for keyB, valueB in iter(sorted(objectlist_B[len(objectlist_B) - 1].items())):
-                if keyB != 'name':
-                    if valueB not in ref_rules[keyB]:
-                        ref_rules[keyB].append(valueB)
-                    temprule_diff[i - 1][keyB] = ref_rules[keyB].index(valueB) - 0
+            temprule_remove_count = i - j
+            for itr in range(j, i):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'remove'
 
         if i < j:
-            for keyN, valueN in iter(sorted(number_list[len(number_list) - 1].items())):
-                if keyN != 'name':
-                    if valueN not in ref_rules[keyN]:
-                        ref_rules[keyN].append(valueN)
-                    temprule_diff[j - 1][keyN] = ref_rules[keyN].index(valueN) - 0
+            temprule_add_count = j - i
+            for itr in range(i, j):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'add'
 
-                    # for index in range(len(temprule_diff)):
-                    # print temprule_diff[index]
-
+                        # for index in range(len(temprule_diff)):
+                        # print temprule_diff[index]
         # print ""
 
         match = True
         for index in range(min(len(rule_diff), len(temprule_diff))):
+            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
+                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
+                break
             if cmp(rule_diff[index], temprule_diff[index]) != 0:
                 match = False
                 break
-        if match:
+        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
             return solution_index
 
     # print ref_rules
 
     return -1
+
+    # Check A & B and apply to C and solution set
 
 
 def find_solution():
@@ -268,19 +268,7 @@ def find_solution():
             for keyR, valueR in iter(sorted(rule_diff[itr].items())):
                 if keyR == 'transform':
                     rule_diff[itr][keyR] = 'add'
-                    # if i > j:
-                    #     for keyA, valueA in iter(sorted(objectlist_A[len(objectlist_A)-1].items())):
-                    #         if keyA != 'name':
-                    #             if valueA not in ref_rules[keyA]:
-                    #                 ref_rules[keyA].append(valueA)
-                    #             rule_diff[i-1][keyA] = ref_rules[keyA].index(valueA) - 0
-                    #
-                    # if i < j:
-                    #     for keyB, valueB in iter(sorted(objectlist_B[len(objectlist_B)-1].items())):
-                    #         if keyB != 'name':
-                    #             if valueB not in ref_rules[keyB]:
-                    #                 ref_rules[keyB].append(valueB)
-                    #             rule_diff[j-1][keyB] = ref_rules[keyB].index(valueB) - 0
+
                     # for index in range(len(rule_diff)):
                     # print rule_diff[index]
     # print ""
@@ -333,19 +321,6 @@ def find_solution():
                 for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
                     if keyR == 'transform':
                         temprule_diff[itr][keyR] = 'add'
-                        # if i > j:
-                        #     for keyC, valueC in iter(sorted(objectlist_C[len(objectlist_C)-1].items())):
-                        #         if keyC != 'name':
-                        #             if valueC not in ref_rules[keyC]:
-                        #                 ref_rules[keyC].append(valueC)
-                        #             temprule_diff[i-1][keyC] = ref_rules[keyC].index(valueC) - 0
-                        #
-                        # if i < j:
-                        #     for keyN, valueN in iter(sorted(number_list[len(number_list)-1].items())):
-                        #         if keyN != 'name':
-                        #             if valueN not in ref_rules[keyN]:
-                        #                 ref_rules[keyN].append(valueN)
-                        #             temprule_diff[j-1][keyN] = ref_rules[keyN].index(valueN) - 0
                         # for index in range(len(temprule_diff)):
                         # print temprule_diff[index]
         # print ""
@@ -363,8 +338,8 @@ def find_solution():
 
     # print ref_rules
 
-    # solution_index = find_solution_alternate()
-    return -1
+    solution_index = find_solution_alternate()
+    return solution_index
 
 
 class Agent:
