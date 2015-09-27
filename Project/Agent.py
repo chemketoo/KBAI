@@ -42,6 +42,7 @@ def parse_problem(key_value, object_list):
         dict_objects = {}
         for attr_name, attr_value in pairs.iteritems():
             dict_objects[attr_name] = attr_value
+            dict_objects['name'] = object_name
             # print attr_name, attr_value
         store_attributes(key_value, dict_objects)
 
@@ -79,6 +80,8 @@ def store_attributes(key_value, dict_objects):
 
 
 def find_solution():
+    rule_array = []
+    temprule_array = []
     rule = {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
             'overlaps': ''}
     ref_rules = {'shape': [],  #
@@ -93,43 +96,61 @@ def find_solution():
 
     solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
 
+    rule_length = max(len(objectlist_A), len(objectlist_B))
+
+    for i in range(rule_length):
+        rule_array.append(rule)
+
     i = 0
     for dict_A in objectlist_A:
         for keyA, valueA in iter(sorted(dict_A.items())):
-            j = 0
-            for dict_B in objectlist_B:
-                for keyB, valueB in iter(sorted(dict_B.items())):
-                    if valueA not in ref_rules[keyA]:
-                        ref_rules[keyA].append(valueA)
-                    if valueB not in ref_rules[keyB]:
-                        ref_rules[keyB].append(valueB)
-                    if keyB == keyA and i == j:
-                        rule[keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyB].index(valueB)
-                j += 1
+            if keyA != 'name':
+                j = 0
+                for dict_B in objectlist_B:
+                    for keyB, valueB in iter(sorted(dict_B.items())):
+                        if keyB != 'name':
+                            if valueA not in ref_rules[keyA]:
+                                ref_rules[keyA].append(valueA)
+                            if valueB not in ref_rules[keyB]:
+                                ref_rules[keyB].append(valueB)
+                            if keyA == keyB and i == j:
+                                rule_array[i if i >= j else j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                    keyB].index(valueB)
+                    j += 1
         i += 1
 
     solution_index = 0
 
+    temp_rule = {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                 'overlaps': ''}
     for number_list in solution_list:
         solution_index += 1
-        temp_rule = {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                     'overlaps': ''}
+        del temprule_array[:]
+        for i in range(len(temp_rule)):
+            temprule_array.append(temp_rule)
         i = 0
         for dict_C in objectlist_C:
             for keyC, valueC in iter(sorted(dict_C.items())):
-                j = 0
-                for dict_N in number_list:
-                    for keyN, valueN in iter(sorted(dict_N.items())):
-                        if valueC not in ref_rules[keyC]:
-                            ref_rules[keyC].append(valueC)
-                        if valueN not in ref_rules[keyN]:
-                            ref_rules[keyN].append(valueN)
-                        if keyN == keyC and i == j:
-                            temp_rule[keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(valueN)
+                if keyC != 'name':
+                    j = 0
+                    for dict_N in number_list:
+                        for keyN, valueN in iter(sorted(dict_N.items())):
+                            if keyN != 'name':
+                                if valueC not in ref_rules[keyC]:
+                                    ref_rules[keyC].append(valueC)
+                                if valueN not in ref_rules[keyN]:
+                                    ref_rules[keyN].append(valueN)
+                                if keyC == keyN and i == j:
+                                    temprule_array[i if i >= j else j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(valueN)
                     j += 1
             i += 1
 
-        if cmp(rule, temp_rule) == 0:
+        match = True
+        for index in range(len(rule_array)):
+            if cmp(rule_array[index], temprule_array[index]) != 0:
+                match = False
+                break
+        if match:
             return solution_index
 
     return -1
