@@ -42,7 +42,7 @@ def main():
         for problem in set.problems:   # Your agent will solve one problem at a time.
             #try:
             #i = i + 1
-            #if i == 1:
+            #if i == 11:
                 problem.setAnswerReceived(agent.Solve(problem))     # The problem will be passed to your agent as a RavensProblem object as a parameter to the Solve method
                                                                 # Your agent should return its answer at the conclusion of the execution of Solve.
                                                                 # Note that if your agent makes use of RavensProblem.check to check its answer, the answer passed to check() will be used.

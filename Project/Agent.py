@@ -93,16 +93,20 @@ def find_solution():
 
     solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
 
+    i = 0
     for dict_A in objectlist_A:
         for keyA, valueA in iter(sorted(dict_A.items())):
+            j = 0
             for dict_B in objectlist_B:
                 for keyB, valueB in iter(sorted(dict_B.items())):
                     if valueA not in ref_rules[keyA]:
                         ref_rules[keyA].append(valueA)
                     if valueB not in ref_rules[keyB]:
                         ref_rules[keyB].append(valueB)
-                    if keyB == keyA:
+                    if keyB == keyA and i == j:
                         rule[keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyB].index(valueB)
+                j += 1
+        i += 1
 
     solution_index = 0
 
@@ -110,16 +114,20 @@ def find_solution():
         solution_index += 1
         temp_rule = {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
                      'overlaps': ''}
+        i = 0
         for dict_C in objectlist_C:
             for keyC, valueC in iter(sorted(dict_C.items())):
+                j = 0
                 for dict_N in number_list:
                     for keyN, valueN in iter(sorted(dict_N.items())):
                         if valueC not in ref_rules[keyC]:
                             ref_rules[keyC].append(valueC)
                         if valueN not in ref_rules[keyN]:
                             ref_rules[keyN].append(valueN)
-                        if keyN == keyC:
+                        if keyN == keyC and i == j:
                             temp_rule[keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(valueN)
+                    j += 1
+            i += 1
 
         if cmp(rule, temp_rule) == 0:
             return solution_index
@@ -171,9 +179,11 @@ class Agent:
                     # print "length of object_list is ", len(object_list)
                     parse_problem(key, object_list)
                     # print "----"
-                # print "********"
+                    # print "********"
 
                 i = find_solution()
-            return i
+                return i
+            else:
+                return -1
         else:
             return -1
