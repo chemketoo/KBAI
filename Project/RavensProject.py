@@ -38,11 +38,11 @@ def main():
     results.write("Problem,Agent's Answer,Correct?,Correct Answer\n")
     setResults.write("Set,Correct,Incorrect,Skipped\n")
     for set in sets:
-        #i = 0
+        i = 0
         for problem in set.problems:   # Your agent will solve one problem at a time.
             #try:
             #i = i + 1
-            #if i == 10:
+            #if i == 12:
                 problem.setAnswerReceived(agent.Solve(problem))     # The problem will be passed to your agent as a RavensProblem object as a parameter to the Solve method
                                                                 # Your agent should return its answer at the conclusion of the execution of Solve.
                                                                 # Note that if your agent makes use of RavensProblem.check to check its answer, the answer passed to check() will be used.

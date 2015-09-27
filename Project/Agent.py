@@ -80,8 +80,8 @@ def store_attributes(key_value, dict_objects):
 
 
 def find_solution_alternate():
-    rule_array = []
-    temprule_array = []
+    rule_diff = []
+    temprule_diff = []
     ref_rules = {'shape': [],  #
                  'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
                  'fill': ['no', 'yes'],
@@ -89,20 +89,21 @@ def find_solution_alternate():
                  'inside': [],
                  'above': [],
                  'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': []
+                 'overlaps': [],
+                 'transform': ['add', 'remove']
                  }
 
-    #solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
+    # solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
     solution_list = [objectlist_3]
-    #print objectlist_A
-    #print objectlist_C
-    #print ""
+    # print objectlist_A
+    # print objectlist_C
+    # print ""
 
     rule_length = max(len(objectlist_A), len(objectlist_C))
 
     for i in range(rule_length):
-        rule_array.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-            'overlaps': ''})
+        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                          'overlaps': '', 'transform': ''})
 
     i = 0
     for dict_A in objectlist_A:
@@ -116,46 +117,47 @@ def find_solution_alternate():
                                 ref_rules[keyA].append(valueA)
                             if valueC not in ref_rules[keyC]:
                                 ref_rules[keyC].append(valueC)
-                            #print keyA, keyC
+                            # print keyA, keyC
                             if keyA == keyC and i == j:
-                                rule_array[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
                                     keyC].index(valueC)
-                    #print ""
+                    # print ""
                     j += 1
         i += 1
 
     if i > j:
-        for keyA, valueA in iter(sorted(objectlist_A[len(objectlist_A)-1].items())):
+        for keyA, valueA in iter(sorted(objectlist_A[len(objectlist_A) - 1].items())):
             if keyA != 'name':
                 if valueA not in ref_rules[keyA]:
                     ref_rules[keyA].append(valueA)
-                rule_array[i-1][keyA] = ref_rules[keyA].index(valueA) - 0
+                rule_diff[i - 1][keyA] = ref_rules[keyA].index(valueA) - 0
 
     if i < j:
-        for keyC, valueC in iter(sorted(objectlist_C[len(objectlist_C)-1].items())):
+        for keyC, valueC in iter(sorted(objectlist_C[len(objectlist_C) - 1].items())):
             if keyC != 'name':
                 if valueC not in ref_rules[keyC]:
                     ref_rules[keyC].append(valueC)
-                rule_array[j-1][keyC] = ref_rules[keyC].index(valueC) - 0
+                rule_diff[j - 1][keyC] = ref_rules[keyC].index(valueC) - 0
 
-    for index in range(len(rule_array)):
-        print rule_array[index]
-    print ""
+                # for index in range(len(rule_diff)):
+                # print rule_diff[index]
+    # print ""
     solution_index = 0
 
-    #print objectlist_C
-    #print objectlist_4
-    #print ""
+    # print objectlist_C
+    # print objectlist_4
+    # print ""
 
     for number_list in solution_list:
         solution_index += 1
         ref_rules['inside'] = []  # Hack for ignoring inside, need to code logic for this
         ref_rules['above'] = []  # Hack for ignoring inside, need to code logic for this
-        del temprule_array[:]
+        del temprule_diff[:]
         temprule_length = max(len(objectlist_B), len(number_list))
         for i in range(temprule_length):
-            temprule_array.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': ''})
+            temprule_diff.append(
+                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                 'overlaps': '', 'transform': ''})
         i = 0
         for dict_B in objectlist_B:
             for keyB, valueB in iter(sorted(dict_B.items())):
@@ -169,45 +171,46 @@ def find_solution_alternate():
                                 if valueN not in ref_rules[keyN]:
                                     ref_rules[keyN].append(valueN)
                                 if keyB == keyN and i == j:
-                                    temprule_array[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(valueN)
+                                    temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
+                                        valueN)
                         j += 1
             i += 1
 
         if i > j:
-            for keyB, valueB in iter(sorted(objectlist_B[len(objectlist_B)-1].items())):
+            for keyB, valueB in iter(sorted(objectlist_B[len(objectlist_B) - 1].items())):
                 if keyB != 'name':
                     if valueB not in ref_rules[keyB]:
                         ref_rules[keyB].append(valueB)
-                    rule_array[i-1][keyB] = ref_rules[keyB].index(valueB) - 0
+                    temprule_diff[i - 1][keyB] = ref_rules[keyB].index(valueB) - 0
 
         if i < j:
-            for keyN, valueN in iter(sorted(number_list[len(number_list)-1].items())):
+            for keyN, valueN in iter(sorted(number_list[len(number_list) - 1].items())):
                 if keyN != 'name':
                     if valueN not in ref_rules[keyN]:
                         ref_rules[keyN].append(valueN)
-                    rule_array[j-1][keyN] = ref_rules[keyN].index(valueN) - 0
+                    temprule_diff[j - 1][keyN] = ref_rules[keyN].index(valueN) - 0
 
-        for index in range(len(temprule_array)):
-            print temprule_array[index]
+                    # for index in range(len(temprule_diff)):
+                    # print temprule_diff[index]
 
-        print ""
+        # print ""
 
         match = True
-        for index in range(min(len(rule_array),len(temprule_array))):
-            if cmp(rule_array[index], temprule_array[index]) != 0:
+        for index in range(min(len(rule_diff), len(temprule_diff))):
+            if cmp(rule_diff[index], temprule_diff[index]) != 0:
                 match = False
                 break
         if match:
             return solution_index
 
-    #print ref_rules
+    # print ref_rules
 
     return -1
 
 
 def find_solution():
-    rule_array = []
-    temprule_array = []
+    rule_diff = []
+    temprule_diff = []
     ref_rules = {'shape': [],  #
                  'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
                  'fill': ['no', 'yes'],
@@ -215,20 +218,21 @@ def find_solution():
                  'inside': [],
                  'above': [],
                  'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': []
+                 'overlaps': [],
+                 'transform': ['add', 'remove']
                  }
 
     solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
-    #solution_list = [objectlist_4]
-    #print objectlist_A
-    #print objectlist_B
-    #print ""
+    # solution_list = [objectlist_6]
+    # print objectlist_A
+    # print objectlist_B
+    # print ""
 
     rule_length = max(len(objectlist_A), len(objectlist_B))
 
     for i in range(rule_length):
-        rule_array.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-            'overlaps': ''})
+        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                          'overlaps': '', 'transform': ''})
 
     i = 0
     for dict_A in objectlist_A:
@@ -243,29 +247,59 @@ def find_solution():
                             if valueB not in ref_rules[keyB]:
                                 ref_rules[keyB].append(valueB)
                             if keyA == keyB and i == j:
-                                rule_array[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
                                     keyB].index(valueB)
                     j += 1
         i += 1
 
-    #for index in range(len(rule_array)):
-        #print rule_array[index]
-    #print ""
+    # print i, j
+    rule_add_count = -1
+    rule_remove_count = -1
+    if i > j:
+        rule_remove_count = i - j
+        for itr in range(j, i):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'remove'
+
+    if i < j:
+        rule_add_count = j - i
+        for itr in range(i, j):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'add'
+                    # if i > j:
+                    #     for keyA, valueA in iter(sorted(objectlist_A[len(objectlist_A)-1].items())):
+                    #         if keyA != 'name':
+                    #             if valueA not in ref_rules[keyA]:
+                    #                 ref_rules[keyA].append(valueA)
+                    #             rule_diff[i-1][keyA] = ref_rules[keyA].index(valueA) - 0
+                    #
+                    # if i < j:
+                    #     for keyB, valueB in iter(sorted(objectlist_B[len(objectlist_B)-1].items())):
+                    #         if keyB != 'name':
+                    #             if valueB not in ref_rules[keyB]:
+                    #                 ref_rules[keyB].append(valueB)
+                    #             rule_diff[j-1][keyB] = ref_rules[keyB].index(valueB) - 0
+                    # for index in range(len(rule_diff)):
+                    # print rule_diff[index]
+    # print ""
     solution_index = 0
 
-    #print objectlist_C
-    #print objectlist_4
-    #print ""
+    # print objectlist_C
+    # print objectlist_4
+    # print ""
 
     for number_list in solution_list:
         solution_index += 1
         ref_rules['inside'] = []  # Hack for ignoring inside, need to code logic for this
         ref_rules['above'] = []  # Hack for ignoring inside, need to code logic for this
-        del temprule_array[:]
+        del temprule_diff[:]
         temprule_length = max(len(objectlist_C), len(number_list))
         for i in range(temprule_length):
-            temprule_array.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': ''})
+            temprule_diff.append(
+                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                 'overlaps': '', 'transform': ''})
         i = 0
         for dict_C in objectlist_C:
             for keyC, valueC in iter(sorted(dict_C.items())):
@@ -279,27 +313,58 @@ def find_solution():
                                 if valueN not in ref_rules[keyN]:
                                     ref_rules[keyN].append(valueN)
                                 if keyC == keyN and i == j:
-                                    temprule_array[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(valueN)
+                                    temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
+                                        valueN)
                         j += 1
             i += 1
 
-        #for index in range(len(rule_array)):
-            #print temprule_array[index]
+        temprule_add_count = -1
+        temprule_remove_count = -1
+        if i > j:
+            temprule_remove_count = i - j
+            for itr in range(j, i):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'remove'
 
-        #print ""
+        if i < j:
+            temprule_add_count = j - i
+            for itr in range(i, j):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'add'
+                        # if i > j:
+                        #     for keyC, valueC in iter(sorted(objectlist_C[len(objectlist_C)-1].items())):
+                        #         if keyC != 'name':
+                        #             if valueC not in ref_rules[keyC]:
+                        #                 ref_rules[keyC].append(valueC)
+                        #             temprule_diff[i-1][keyC] = ref_rules[keyC].index(valueC) - 0
+                        #
+                        # if i < j:
+                        #     for keyN, valueN in iter(sorted(number_list[len(number_list)-1].items())):
+                        #         if keyN != 'name':
+                        #             if valueN not in ref_rules[keyN]:
+                        #                 ref_rules[keyN].append(valueN)
+                        #             temprule_diff[j-1][keyN] = ref_rules[keyN].index(valueN) - 0
+                        # for index in range(len(temprule_diff)):
+                        # print temprule_diff[index]
+        # print ""
 
         match = True
-        for index in range(min(len(rule_array),len(temprule_array))):
-            if cmp(rule_array[index], temprule_array[index]) != 0:
+        for index in range(min(len(rule_diff), len(temprule_diff))):
+            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
+                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
+                break
+            if cmp(rule_diff[index], temprule_diff[index]) != 0:
                 match = False
                 break
-        if match:
+        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
             return solution_index
 
-    #print ref_rules
+    # print ref_rules
 
-    solution_index = find_solution_alternate()
-    return solution_index
+    # solution_index = find_solution_alternate()
+    return -1
 
 
 class Agent:
