@@ -105,23 +105,14 @@ def find_solution():
                         rule[keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyB].index(valueB)
 
     solution_index = 0
-    # break_outer = False
 
     for number_list in solution_list:
         solution_index += 1
-        # solution = True
         temp_rule = {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
                      'overlaps': ''}
         for dict_C in objectlist_C:
-            # if break_outer:
-            # break_outer = False
-            # break
             for keyC, valueC in iter(sorted(dict_C.items())):
-                # if break_outer:
-                # break
                 for dict_N in number_list:
-                    # if break_outer:
-                    # break
                     for keyN, valueN in iter(sorted(dict_N.items())):
                         if valueC not in ref_rules[keyC]:
                             ref_rules[keyC].append(valueC)
@@ -131,7 +122,6 @@ def find_solution():
                             temp_rule[keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(valueN)
 
         if cmp(rule, temp_rule) == 0:
-            # print solution_index
             return solution_index
 
     return -1
