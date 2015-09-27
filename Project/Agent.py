@@ -383,11 +383,7 @@ class Agent:
                 for key, value in sorted(prob.iteritems()):
                     figure = prob[key]
                     object_list = figure.objects
-                    # print "length of object_list is ", len(object_list)
                     parse_problem(key, object_list)
-                    # print "----"
-                    # print "********"
-
                 i = find_solution()
                 return i
             else:
