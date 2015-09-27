@@ -38,16 +38,19 @@ def main():
     results.write("Problem,Agent's Answer,Correct?,Correct Answer\n")
     setResults.write("Set,Correct,Incorrect,Skipped\n")
     for set in sets:
+        #i = 0
         for problem in set.problems:   # Your agent will solve one problem at a time.
             #try:
-            problem.setAnswerReceived(agent.Solve(problem))     # The problem will be passed to your agent as a RavensProblem object as a parameter to the Solve method
+            #i = i + 1
+            #if i == 1:
+                problem.setAnswerReceived(agent.Solve(problem))     # The problem will be passed to your agent as a RavensProblem object as a parameter to the Solve method
                                                                 # Your agent should return its answer at the conclusion of the execution of Solve.
                                                                 # Note that if your agent makes use of RavensProblem.check to check its answer, the answer passed to check() will be used.
                                                                 # Your agent cannot change its answer once it has checked its answer.
 
-            result=problem.name + "," + str(problem.givenAnswer) + "," + problem.getCorrect() + "," + str(problem.correctAnswer)
+                result=problem.name + "," + str(problem.givenAnswer) + "," + problem.getCorrect() + "," + str(problem.correctAnswer)
 
-            results.write("%s\n" % result)
+                results.write("%s\n" % result)
             #except:
             #    print("Error encountered in " + problem.name + ":")
             #    print(sys.exc_info()[0])
