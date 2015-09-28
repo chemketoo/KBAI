@@ -11,6 +11,8 @@
 # Install Pillow and uncomment this line to access image processing.
 # from PIL import Image
 
+__author__ = "Bhanu Verma"
+
 objectlist_A = []
 objectlist_B = []
 objectlist_C = []
@@ -116,7 +118,7 @@ def map_vertically():
                                     rule_diff[j][keyA] = len(valueA) - len(valueC)
                                 else:
                                     rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
-                                    keyC].index(valueC)
+                                        keyC].index(valueC)
                     j += 1
         i += 1
 
@@ -169,7 +171,7 @@ def map_vertically():
                                         temprule_diff[j][keyB] = len(valueB) - len(valueN)
                                     else:
                                         temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
-                                        valueN)
+                                            valueN)
                         j += 1
             i += 1
 
