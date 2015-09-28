@@ -106,12 +106,17 @@ def find_solution_alternate():
                     for keyC, valueC in iter(sorted(dict_C.items())):
                         if keyC != 'name':
                             if valueA not in ref_rules[keyA]:
-                                ref_rules[keyA].append(valueA)
+                                if keyA != 'inside' and keyA != 'above':
+                                    ref_rules[keyA].append(valueA)
                             if valueC not in ref_rules[keyC]:
-                                ref_rules[keyC].append(valueC)
+                                if keyC != 'inside' and keyC != 'above':
+                                    ref_rules[keyC].append(valueC)
                             # print keyA, keyC
                             if keyA == keyC and i == j:
-                                rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                if keyA == 'inside' or keyA == 'above':
+                                    rule_diff[j][keyA] = len(valueA) - len(valueC)
+                                else:
+                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
                                     keyC].index(valueC)
                     # print ""
                     j += 1
@@ -133,8 +138,8 @@ def find_solution_alternate():
                 if keyR == 'transform':
                     rule_diff[itr][keyR] = 'add'
 
-    # for index in range(len(rule_diff)):
-    # print rule_diff[index]
+                    # for index in range(len(rule_diff)):
+                    # print rule_diff[index]
     # print ""
     solution_index = 0
 
@@ -144,8 +149,6 @@ def find_solution_alternate():
 
     for number_list in solution_list:
         solution_index += 1
-        ref_rules['inside'] = []  # Hack for ignoring inside, need to code logic for this
-        ref_rules['above'] = []  # Hack for ignoring inside, need to code logic for this
         del temprule_diff[:]
         temprule_length = max(len(objectlist_B), len(number_list))
         for i in range(temprule_length):
@@ -161,11 +164,16 @@ def find_solution_alternate():
                         for keyN, valueN in iter(sorted(dict_N.items())):
                             if keyN != 'name':
                                 if valueB not in ref_rules[keyB]:
-                                    ref_rules[keyB].append(valueB)
+                                    if keyB != 'inside' and keyB != 'above':
+                                        ref_rules[keyB].append(valueB)
                                 if valueN not in ref_rules[keyN]:
-                                    ref_rules[keyN].append(valueN)
+                                    if keyN != 'inside' and keyN != 'above':
+                                        ref_rules[keyN].append(valueN)
                                 if keyB == keyN and i == j:
-                                    temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
+                                    if keyB == 'inside' or keyB == 'above':
+                                        temprule_diff[j][keyB] = len(valueB) - len(valueN)
+                                    else:
+                                        temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
                                         valueN)
                         j += 1
             i += 1
@@ -243,12 +251,17 @@ def find_solution():
                     for keyB, valueB in iter(sorted(dict_B.items())):
                         if keyB != 'name':
                             if valueA not in ref_rules[keyA]:
-                                ref_rules[keyA].append(valueA)
+                                if keyA != 'inside' and keyA != 'above':
+                                    ref_rules[keyA].append(valueA)
                             if valueB not in ref_rules[keyB]:
-                                ref_rules[keyB].append(valueB)
+                                if keyB != 'inside' and keyB != 'above':
+                                    ref_rules[keyB].append(valueB)
                             if keyA == keyB and i == j:
-                                rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
-                                    keyB].index(valueB)
+                                if keyA == 'inside' or keyA == 'above':
+                                    rule_diff[j][keyA] = len(valueA) - len(valueB)
+                                else:
+                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                        keyB].index(valueB)
                     j += 1
         i += 1
 
@@ -269,8 +282,8 @@ def find_solution():
                 if keyR == 'transform':
                     rule_diff[itr][keyR] = 'add'
 
-                    # for index in range(len(rule_diff)):
-                    # print rule_diff[index]
+    # for index in range(len(rule_diff)):
+    #     print rule_diff[index]
     # print ""
     solution_index = 0
 
@@ -280,8 +293,6 @@ def find_solution():
 
     for number_list in solution_list:
         solution_index += 1
-        ref_rules['inside'] = []  # Hack for ignoring inside, need to code logic for this
-        ref_rules['above'] = []  # Hack for ignoring inside, need to code logic for this
         del temprule_diff[:]
         temprule_length = max(len(objectlist_C), len(number_list))
         for i in range(temprule_length):
@@ -297,12 +308,17 @@ def find_solution():
                         for keyN, valueN in iter(sorted(dict_N.items())):
                             if keyN != 'name':
                                 if valueC not in ref_rules[keyC]:
-                                    ref_rules[keyC].append(valueC)
+                                    if keyC != 'inside' and keyC != 'above':
+                                        ref_rules[keyC].append(valueC)
                                 if valueN not in ref_rules[keyN]:
-                                    ref_rules[keyN].append(valueN)
+                                    if keyN != 'inside' and keyN != 'above':
+                                        ref_rules[keyN].append(valueN)
                                 if keyC == keyN and i == j:
-                                    temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
-                                        valueN)
+                                    if keyC == 'inside' or keyC == 'above':
+                                        temprule_diff[j][keyC] = len(valueC) - len(valueN)
+                                    else:
+                                        temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
+                                            valueN)
                         j += 1
             i += 1
 
@@ -321,8 +337,9 @@ def find_solution():
                 for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
                     if keyR == 'transform':
                         temprule_diff[itr][keyR] = 'add'
-                        # for index in range(len(temprule_diff)):
-                        # print temprule_diff[index]
+
+        # for index in range(len(temprule_diff)):
+        #     print temprule_diff[index]
         # print ""
 
         match = True
