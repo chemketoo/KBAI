@@ -379,7 +379,7 @@ class Agent:
     # Returning your answer as a string may cause your program to crash.
     def Solve(self, problem):
         init_objects()
-        print "Solving " + problem.name
+        print "Attempting to solve " + problem.name
         if problem.hasVerbal:
             if problem.problemType == '2x2':
                 prob = problem.figures
