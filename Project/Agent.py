@@ -112,13 +112,11 @@ def map_vertically():
                             if valueC not in ref_rules[keyC]:
                                 if keyC != 'inside' and keyC != 'above':
                                     ref_rules[keyC].append(valueC)
-                            # print keyA, keyC
                             if keyA == keyC and i == j:
                                 if keyA == 'inside' or keyA == 'above':
                                     rule_diff[j][keyA] = len(valueA) - len(valueC)
                                 else:
-                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
-                                        keyC].index(valueC)
+                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyC].index(valueC)
                     j += 1
         i += 1
 
