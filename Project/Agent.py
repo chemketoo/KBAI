@@ -440,7 +440,7 @@ def find_solution_advanced():
     return -1
 
 
-def check_symmetry():
+def solve_by_reflection():
     global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
         figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
         figure7_Image, figure8_Image
@@ -485,11 +485,6 @@ def find_difference(first_figure, second_figure):
     # print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
 
     return (dif / 255.0 * 100) / ncomponents
-
-
-def find_solution_visual():
-    answer = check_symmetry()
-    return answer
 
 
 def map_vertically_basic():
@@ -815,10 +810,12 @@ class Agent:
                 figure = prob[key]
                 file_name = figure.visualFilename
                 load_image(key, file_name)
-            i = find_solution_visual()
+            i = solve_by_reflection()
             if i == -1:
                 print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-            return i
+                return i
+            else:
+                return i
         else:
             print "My creator has not equipped me to handle 3x3 problems yet. I would skip this problem." + "\n"
             return -1
