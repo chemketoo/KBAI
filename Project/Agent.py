@@ -9,19 +9,45 @@
 # These methods will be necessary for the project's main method to run.
 
 # Install Pillow and uncomment this line to access image processing.
-# from PIL import Image
+
+from PIL import Image
+from itertools import izip
 
 __author__ = "Bhanu Verma"
+
+figureA_Image = None
+figureB_Image = None
+figureC_Image = None
+figureD_Image = None
+figureE_Image = None
+figureF_Image = None
+figureG_Image = None
+figureH_Image = None
+figure1_Image = None
+figure2_Image = None
+figure3_Image = None
+figure4_Image = None
+figure5_Image = None
+figure6_Image = None
+figure7_Image = None
+figure8_Image = None
 
 objectlist_A = []
 objectlist_B = []
 objectlist_C = []
+objectlist_D = []
+objectlist_E = []
+objectlist_F = []
+objectlist_G = []
+objectlist_H = []
 objectlist_1 = []
 objectlist_2 = []
 objectlist_3 = []
 objectlist_4 = []
 objectlist_5 = []
 objectlist_6 = []
+objectlist_7 = []
+objectlist_8 = []
 
 
 def init_objects():
@@ -30,12 +56,19 @@ def init_objects():
     del objectlist_A[:]
     del objectlist_B[:]
     del objectlist_C[:]
+    del objectlist_D[:]
+    del objectlist_E[:]
+    del objectlist_F[:]
+    del objectlist_G[:]
+    del objectlist_H[:]
     del objectlist_1[:]
     del objectlist_2[:]
     del objectlist_3[:]
     del objectlist_4[:]
     del objectlist_5[:]
     del objectlist_6[:]
+    del objectlist_7[:]
+    del objectlist_8[:]
 
 
 def parse_problem(key_value, object_list):
@@ -48,15 +81,63 @@ def parse_problem(key_value, object_list):
         store_attributes(key_value, dict_objects)
 
 
+def load_image(key_value, file_name):
+    global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
+        figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
+        figure7_Image, figure8_Image
+    if key_value == 'A':
+        figureA_Image = Image.open(file_name)
+    if key_value == 'B':
+        figureB_Image = Image.open(file_name)
+    if key_value == 'C':
+        figureC_Image = Image.open(file_name)
+    if key_value == 'D':
+        figureD_Image = Image.open(file_name)
+    if key_value == 'E':
+        figureE_Image = Image.open(file_name)
+    if key_value == 'F':
+        figureF_Image = Image.open(file_name)
+    if key_value == 'G':
+        figureG_Image = Image.open(file_name)
+    if key_value == 'H':
+        figureH_Image = Image.open(file_name)
+    if key_value == '1':
+        figure1_Image = Image.open(file_name)
+    if key_value == '2':
+        figure2_Image = Image.open(file_name)
+    if key_value == '3':
+        figure3_Image = Image.open(file_name)
+    if key_value == '4':
+        figure4_Image = Image.open(file_name)
+    if key_value == '5':
+        figure5_Image = Image.open(file_name)
+    if key_value == '6':
+        figure6_Image = Image.open(file_name)
+    if key_value == '7':
+        figure7_Image = Image.open(file_name)
+    if key_value == '8':
+        figure8_Image = Image.open(file_name)
+
+
 def store_attributes(key_value, dict_objects):
-    global objectlist_A, objectlist_B, objectlist_C, objectlist_1, objectlist_2, objectlist_3, \
-        objectlist_4, objectlist_5, objectlist_6
+    global objectlist_A, objectlist_B, objectlist_C, objectlist_D, objectlist_E, objectlist_F, objectlist_G, \
+        objectlist_H, objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6, objectlist_7, objectlist_8
     if key_value == 'A':
         objectlist_A.append(dict_objects)
     if key_value == 'B':
         objectlist_B.append(dict_objects)
     if key_value == 'C':
         objectlist_C.append(dict_objects)
+    if key_value == 'D':
+        objectlist_D.append(dict_objects)
+    if key_value == 'E':
+        objectlist_E.append(dict_objects)
+    if key_value == 'F':
+        objectlist_F.append(dict_objects)
+    if key_value == 'G':
+        objectlist_G.append(dict_objects)
+    if key_value == 'H':
+        objectlist_H.append(dict_objects)
     if key_value == '1':
         objectlist_1.append(dict_objects)
     if key_value == '2':
@@ -69,11 +150,317 @@ def store_attributes(key_value, dict_objects):
         objectlist_5.append(dict_objects)
     if key_value == '6':
         objectlist_6.append(dict_objects)
+    if key_value == '7':
+        objectlist_7.append(dict_objects)
+    if key_value == '8':
+        objectlist_8.append(dict_objects)
 
         # Check A & C and apply to B and solution set
 
 
-def map_vertically():
+def map_vertically_advanced():
+    rule_diff = []
+    temprule_diff = []
+    ref_rules = {'shape': [],  #
+                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
+                 'fill': ['no', 'yes'],
+                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
+                 'inside': [],
+                 'above': [],
+                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
+                 'overlaps': [],
+                 'transform': ['add', 'remove'],
+                 'left-of': [],
+                 'height': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],
+                 'width': ['very small', 'small', 'medium', 'large', 'very large', 'huge']
+                 }
+
+    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
+
+    rule_length = max(len(objectlist_A), len(objectlist_C))
+
+    for i in range(rule_length):
+        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                          'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
+
+    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
+    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
+
+    i = 0
+    for dict_A in objectlist_A:
+        for keyA, valueA in iter(sorted(dict_A.items())):
+            if keyA != 'name':
+                j = 0
+                for dict_C in objectlist_C:
+                    for keyC, valueC in iter(sorted(dict_C.items())):
+                        if keyC != 'name':
+                            if valueA not in ref_rules[keyA]:
+                                if keyA != 'inside' and keyA != 'above':
+                                    ref_rules[keyA].append(valueA)
+                            if valueC not in ref_rules[keyC]:
+                                if keyC != 'inside' and keyC != 'above':
+                                    ref_rules[keyC].append(valueC)
+                            if keyA == keyC and i == j:
+                                if keyA == 'inside' or keyA == 'above':
+                                    rule_diff[j][keyA] = len(valueA) - len(valueC)
+                                else:
+                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyC].index(valueC)
+                    j += 1
+        i += 1
+
+    rule_add_count = -1
+    rule_remove_count = -1
+    if i > j:
+        rule_remove_count = i - j
+        for itr in range(j, i):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'remove'
+
+    if i < j:
+        rule_add_count = j - i
+        for itr in range(i, j):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'add'
+
+    solution_index = 0
+
+    for number_list in solution_list:
+        solution_index += 1
+        del temprule_diff[:]
+        temprule_length = max(len(objectlist_B), len(number_list))
+        for i in range(temprule_length):
+            temprule_diff.append(
+                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                 'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
+
+        # number_list.sort(lambda x, y: cmp(len(x), len(y)))
+        # objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
+
+        i = 0
+        for dict_B in objectlist_B:
+            for keyB, valueB in iter(sorted(dict_B.items())):
+                if keyB != 'name':
+                    j = 0
+                    for dict_N in number_list:
+                        for keyN, valueN in iter(sorted(dict_N.items())):
+                            if keyN != 'name':
+                                if valueB not in ref_rules[keyB]:
+                                    if keyB != 'inside' and keyB != 'above':
+                                        ref_rules[keyB].append(valueB)
+                                if valueN not in ref_rules[keyN]:
+                                    if keyN != 'inside' and keyN != 'above':
+                                        ref_rules[keyN].append(valueN)
+                                if keyB == keyN and i == j:
+                                    if keyB == 'inside' or keyB == 'above':
+                                        temprule_diff[j][keyB] = len(valueB) - len(valueN)
+                                    else:
+                                        temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
+                                            valueN)
+                        j += 1
+            i += 1
+
+        temprule_add_count = -1
+        temprule_remove_count = -1
+        if i > j:
+            temprule_remove_count = i - j
+            for itr in range(j, i):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'remove'
+
+        if i < j:
+            temprule_add_count = j - i
+            for itr in range(i, j):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'add'
+
+        match = True
+        for index in range(min(len(rule_diff), len(temprule_diff))):
+            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
+                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
+                break
+            if cmp(rule_diff[index], temprule_diff[index]) != 0:
+                match = False
+                break
+        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
+            return solution_index
+
+    return -1
+
+
+def find_solution_advanced():
+    rule_diff = []
+    temprule_diff = []
+    ref_rules = {'shape': [],  #
+                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
+                 'fill': ['no', 'yes'],
+                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
+                 'inside': [],
+                 'above': [],
+                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
+                 'overlaps': [],
+                 'transform': ['add', 'remove'],
+                 'left-of': [],
+                 'height': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],
+                 'width': ['very small', 'small', 'medium', 'large', 'very large', 'huge']
+                 }
+
+    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6, objectlist_7,
+                     objectlist_8]
+
+    rule_length = max(len(objectlist_A), len(objectlist_B))
+
+    for i in range(rule_length):
+        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                          'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
+
+    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
+    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
+
+    i = 0
+    print len(objectlist_A)
+    print len(objectlist_B)
+    for dict_A in objectlist_A:
+        for keyA, valueA in iter(sorted(dict_A.items())):
+            if keyA != 'name':
+                j = 0
+                for dict_B in objectlist_B:
+                    for keyB, valueB in iter(sorted(dict_B.items())):
+                        if keyB != 'name':
+                            if valueA not in ref_rules[keyA]:
+                                if keyA != 'inside' and keyA != 'above':
+                                    ref_rules[keyA].append(valueA)
+                            if valueB not in ref_rules[keyB]:
+                                if keyB != 'inside' and keyB != 'above':
+                                    ref_rules[keyB].append(valueB)
+                            if keyA == keyB and i == j:
+                                if keyA == 'inside' or keyA == 'above':
+                                    rule_diff[j][keyA] = len(valueA) - len(valueB)
+                                else:
+                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
+                                        keyB].index(valueB)
+                    j += 1
+        i += 1
+
+    rule_add_count = -1
+    rule_remove_count = -1
+    if i > j:
+        rule_remove_count = i - j
+        for itr in range(j, i):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'remove'
+
+    if i < j:
+        rule_add_count = j - i
+        for itr in range(i, j):
+            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
+                if keyR == 'transform':
+                    rule_diff[itr][keyR] = 'add'
+
+    solution_index = 0
+
+    for number_list in solution_list:
+        solution_index += 1
+        del temprule_diff[:]
+        temprule_length = max(len(objectlist_C), len(number_list))
+        for i in range(temprule_length):
+            temprule_diff.append(
+                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
+                 'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
+
+        number_list.sort(lambda x, y: cmp(len(x), len(y)))
+        objectlist_C.sort(lambda x, y: cmp(len(x), len(y)))
+
+        i = 0
+        for dict_C in objectlist_C:
+            for keyC, valueC in iter(sorted(dict_C.items())):
+                if keyC != 'name':
+                    j = 0
+                    for dict_N in number_list:
+                        for keyN, valueN in iter(sorted(dict_N.items())):
+                            if keyN != 'name':
+                                if valueC not in ref_rules[keyC]:
+                                    if keyC != 'inside' and keyC != 'above':
+                                        ref_rules[keyC].append(valueC)
+                                if valueN not in ref_rules[keyN]:
+                                    if keyN != 'inside' and keyN != 'above':
+                                        ref_rules[keyN].append(valueN)
+                                if keyC == keyN and i == j:
+                                    if keyC == 'inside' or keyC == 'above':
+                                        temprule_diff[j][keyC] = len(valueC) - len(valueN)
+                                    else:
+                                        temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
+                                            valueN)
+                        j += 1
+            i += 1
+
+        temprule_add_count = -1
+        temprule_remove_count = -1
+        if i > j:
+            temprule_remove_count = i - j
+            for itr in range(j, i):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'remove'
+
+        if i < j:
+            temprule_add_count = j - i
+            for itr in range(i, j):
+                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
+                    if keyR == 'transform':
+                        temprule_diff[itr][keyR] = 'add'
+
+        match = True
+        for index in range(min(len(rule_diff), len(temprule_diff))):
+            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
+                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
+                break
+            if cmp(rule_diff[index], temprule_diff[index]) != 0:
+                match = False
+                break
+
+        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
+            temp_index = map_vertically_advanced()
+            if temp_index == solution_index and solution_index != -1:
+                print "Solved by both horizontal and vertical symmetry" + "\n"
+                return solution_index
+            else:
+                if solution_index != -1:
+                    print "Solved by horizontal symmetry" + "\n"
+                    return solution_index
+                elif temp_index != -1:
+                    print "Solved by vertical symmetry" + "\n"
+                    return temp_index
+
+    return -1
+
+
+def find_solution_visual():
+    global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
+        figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
+        figure7_Image, figure8_Image
+
+    pairs = izip(figureG_Image.getdata(), figure4_Image.getdata())
+    if len(figureG_Image.getbands()) == 1:
+        # for gray-scale jpegs
+        print "A"
+        dif = sum(abs(p1-p2) for p1, p2 in pairs)
+    else:
+        print "B"
+        dif = sum(abs(c1-c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
+
+    print figureG_Image.size[0], dif
+    ncomponents = figureG_Image.size[0] * figureG_Image.size[1] * 3
+    print ncomponents
+    print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
+    return -1
+
+
+def map_vertically_basic():
     rule_diff = []
     temprule_diff = []
     ref_rules = {'shape': [],  #
@@ -147,8 +534,8 @@ def map_vertically():
                 {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
                  'overlaps': '', 'transform': ''})
 
-        number_list.sort(lambda x, y: cmp(len(x), len(y)))
-        objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
+        # number_list.sort(lambda x, y: cmp(len(x), len(y)))
+        # objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
 
         i = 0
         for dict_B in objectlist_B:
@@ -203,7 +590,7 @@ def map_vertically():
     return -1
 
 
-def find_solution():
+def find_solution_basic():
     rule_diff = []
     temprule_diff = []
     ref_rules = {'shape': [],  #
@@ -330,7 +717,7 @@ def find_solution():
                 break
 
         if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
-            temp_index = map_vertically()
+            temp_index = map_vertically_basic()
             if temp_index == solution_index and solution_index != -1:
                 print "Solved by both horizontal and vertical symmetry" + "\n"
                 return solution_index
@@ -387,7 +774,17 @@ class Agent:
                     figure = prob[key]
                     object_list = figure.objects
                     parse_problem(key, object_list)
-                i = find_solution()
+                i = find_solution_basic()
+                if i == -1:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                return i
+            elif problem.problemType == '3x3':
+                prob = problem.figures
+                for key, value in sorted(prob.iteritems()):
+                    figure = prob[key]
+                    file_name = figure.visualFilename
+                    load_image(key, file_name)
+                i = find_solution_visual()
                 if i == -1:
                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
                 return i
