@@ -12,6 +12,7 @@
 
 from PIL import Image
 from itertools import izip
+import math
 
 __author__ = "Bhanu Verma"
 
@@ -439,25 +440,56 @@ def find_solution_advanced():
     return -1
 
 
-def find_solution_visual():
+def check_symmetry():
     global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
         figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
         figure7_Image, figure8_Image
 
-    pairs = izip(figureG_Image.getdata(), figure4_Image.getdata())
-    if len(figureG_Image.getbands()) == 1:
+    value_array = []
+    transpose_a = figureA_Image.transpose(Image.FLIP_LEFT_RIGHT)
+    diff = find_difference(transpose_a, figureC_Image)
+
+    if diff < 1:
+        transpose_g = figureG_Image.transpose(Image.FLIP_LEFT_RIGHT)
+        diff_1 = math.fabs(find_difference(transpose_g, figure1_Image) - diff)
+        value_array.append(diff_1)
+        diff_2 = math.fabs(find_difference(transpose_g, figure2_Image) - diff)
+        value_array.append(diff_2)
+        diff_3 = math.fabs(find_difference(transpose_g, figure3_Image) - diff)
+        value_array.append(diff_3)
+        diff_4 = math.fabs(find_difference(transpose_g, figure4_Image) - diff)
+        value_array.append(diff_4)
+        diff_5 = math.fabs(find_difference(transpose_g, figure5_Image) - diff)
+        value_array.append(diff_5)
+        diff_6 = math.fabs(find_difference(transpose_g, figure6_Image) - diff)
+        value_array.append(diff_6)
+        diff_7 = math.fabs(find_difference(transpose_g, figure7_Image) - diff)
+        value_array.append(diff_7)
+        diff_8 = math.fabs(find_difference(transpose_g, figure8_Image) - diff)
+        value_array.append(diff_8)
+
+        return value_array.index(min(value_array)) + 1
+    else:
+        return -1
+
+
+def find_difference(first_figure, second_figure):
+    pairs = izip(first_figure.getdata(), second_figure.getdata())
+    if len(first_figure.getbands()) == 1:
         # for gray-scale jpegs
-        print "A"
         dif = sum(abs(p1-p2) for p1, p2 in pairs)
     else:
-        print "B"
         dif = sum(abs(c1-c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
 
-    print figureG_Image.size[0], dif
-    ncomponents = figureG_Image.size[0] * figureG_Image.size[1] * 3
-    print ncomponents
-    print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
-    return -1
+    ncomponents = first_figure.size[0] * first_figure.size[1] * 3
+    # print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
+
+    return (dif / 255.0 * 100) / ncomponents
+
+
+def find_solution_visual():
+    answer = check_symmetry()
+    return answer
 
 
 def map_vertically_basic():
@@ -767,30 +799,26 @@ class Agent:
     def Solve(self, problem):
         init_objects()
         print "Attempting to solve " + problem.name
-        if problem.hasVerbal:
-            if problem.problemType == '2x2':
-                prob = problem.figures
-                for key, value in sorted(prob.iteritems()):
-                    figure = prob[key]
-                    object_list = figure.objects
-                    parse_problem(key, object_list)
-                i = find_solution_basic()
-                if i == -1:
-                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                return i
-            elif problem.problemType == '3x3':
-                prob = problem.figures
-                for key, value in sorted(prob.iteritems()):
-                    figure = prob[key]
-                    file_name = figure.visualFilename
-                    load_image(key, file_name)
-                i = find_solution_visual()
-                if i == -1:
-                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                return i
-            else:
-                print "My creator has not equipped me to handle 3x3 problems yet. I would skip this problem." + "\n"
-                return -1
+        if problem.problemType == '2x2':
+            prob = problem.figures
+            for key, value in sorted(prob.iteritems()):
+                figure = prob[key]
+                object_list = figure.objects
+                parse_problem(key, object_list)
+            i = find_solution_basic()
+            if i == -1:
+                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+            return i
+        elif problem.problemType == '3x3':
+            prob = problem.figures
+            for key, value in sorted(prob.iteritems()):
+                figure = prob[key]
+                file_name = figure.visualFilename
+                load_image(key, file_name)
+            i = find_solution_visual()
+            if i == -1:
+                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+            return i
         else:
-            print "As of now, I can only solve problems which have verbal data. I would skip this problem." + "\n"
+            print "My creator has not equipped me to handle 3x3 problems yet. I would skip this problem." + "\n"
             return -1
