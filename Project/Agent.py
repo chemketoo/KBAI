@@ -442,10 +442,6 @@ def find_solution_advanced():
 
 def solve_by_reflection():
     try:
-        global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
-            figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
-            figure7_Image, figure8_Image
-
         value_array = []
         transpose_a = figureA_Image.transpose(Image.FLIP_LEFT_RIGHT)
         diff = find_difference(transpose_a, figureC_Image)
@@ -473,9 +469,10 @@ def solve_by_reflection():
         else:
             return -1
 
-    except (RuntimeError, TypeError, NameError):
+    except BaseException:
         pass
 
+    return -1
 
         # TODO: normal scaling
 
@@ -501,7 +498,7 @@ def solve_by_pixel_diff(problem):
             else:
                 return -1
 
-    except (RuntimeError, TypeError, NameError):
+    except BaseException:
         pass
 
     return -1
@@ -549,7 +546,7 @@ def solve_by_offset(problem, flag):
             else:
                 return solve_by_offset(problem, 1)
 
-    except (RuntimeError, TypeError, NameError):
+    except BaseException:
         pass
 
     return -1
@@ -641,7 +638,7 @@ def solve_by_special_scaling(problem):
 
             return diff_score_array.index(min(diff_score_array)) + 1
 
-    except (RuntimeError, TypeError, NameError):
+    except BaseException:
         pass
 
     return -1
@@ -651,75 +648,52 @@ def solve_by_special_scaling(problem):
 
 
 def solve_by_rolling(problem):
-    width, length = figureA_Image.size[0], figureA_Image.size[1]
+    try:
+        width, length = figureA_Image.size[0], figureA_Image.size[1]
 
-    left_half = figureA_Image.crop((0, 0, width/2, length))
-    right_half = figureA_Image.crop((width/2, 0, width, length))
+        left_half = figureA_Image.crop((0, 0, width/2, length))
+        right_half = figureA_Image.crop((width/2, 0, width, length))
 
-    final_image = figureA_Image.copy()
-    final_image.paste(right_half, (5, 0, width/2+5, length))
-    final_image.paste(left_half, (width/2-5, 0, width-5, length))
+        final_image = figureA_Image.copy()
+        final_image.paste(right_half, (5, 0, width/2+5, length))
+        final_image.paste(left_half, (width/2-5, 0, width-5, length))
 
-    diff = find_difference(final_image, figureC_Image)
+        diff = find_difference(final_image, figureC_Image)
 
-    if diff <= 2:
-        width, length = figureG_Image.size[0], figureG_Image.size[1]
+        if diff <= 2:
+            width, length = figureG_Image.size[0], figureG_Image.size[1]
 
-        left_half = figureG_Image.crop((0, 0, width/2, length))
-        right_half = figureG_Image.crop((width/2, 0, width, length))
+            left_half = figureG_Image.crop((0, 0, width/2, length))
+            right_half = figureG_Image.crop((width/2, 0, width, length))
 
-        final_transform = figureG_Image.copy()
-        final_transform.paste(right_half, (0, 0, width/2, length))
-        final_transform.paste(left_half, (width/2, 0, width, length))
+            final_transform = figureG_Image.copy()
+            final_transform.paste(right_half, (0, 0, width/2, length))
+            final_transform.paste(left_half, (width/2, 0, width, length))
 
-        diff_score_array = []
-        for i in range(1, 9):
-            result_option = Image.open(problem.figures[str(i)].visualFilename)
-            diff_score = find_difference(final_transform, result_option)
-            diff_score_array.append(diff_score)
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(final_transform, result_option)
+                diff_score_array.append(diff_score)
 
-        return diff_score_array.index(min(diff_score_array)) + 1
+            return diff_score_array.index(min(diff_score_array)) + 1
+
+        return -1
+    except BaseException:
+        pass
 
     return -1
 
 
 def solve_by_misc(problem):
     try:
-        figureC_bw = figureC_Image.convert(mode='L')
-        figureCLoaded = figureC_bw.load()
-        c_pixel = 0
-        for i in range(0, figureC_Image.size[0]):
-            for j in range(0, figureC_Image.size[1]):
-                thisPixel = figureCLoaded[i, j]
-                if thisPixel == 0:
-                    c_pixel += 1
+        c_pixel = get_pixel_count(figureC_Image)
+        f_pixel = get_pixel_count(figureF_Image)
+        g_pixel = get_pixel_count(figureG_Image)
+        h_pixel = get_pixel_count(figureH_Image)
 
-        figureF_bw = figureF_Image.convert(mode='L')
-        figureFLoaded = figureF_bw.load()
-        f_pixel = 0
-        for i in range(0, figureF_Image.size[0]):
-            for j in range(0, figureF_Image.size[1]):
-                thisPixel = figureFLoaded[i, j]
-                if thisPixel == 0:
-                    f_pixel += 1
-
-        figureG_bw = figureG_Image.convert(mode='L')
-        figureGLoaded = figureG_bw.load()
-        g_pixel = 0
-        for i in range(0, figureG_Image.size[0]):
-            for j in range(0, figureG_Image.size[1]):
-                thisPixel = figureGLoaded[i, j]
-                if thisPixel == 0:
-                    g_pixel += 1
-
-        figureH_bw = figureH_Image.convert(mode='L')
-        figureHLoaded = figureH_bw.load()
-        h_pixel = 0
-        for i in range(0, figureH_Image.size[0]):
-            for j in range(0, figureH_Image.size[1]):
-                thisPixel = figureHLoaded[i, j]
-                if thisPixel == 0:
-                    h_pixel += 1
+        if c_pixel == -1 or f_pixel == -1 or g_pixel == -1 or h_pixel == -1:
+            return -1
 
         diff1 = c_pixel - f_pixel
         diff2 = g_pixel - h_pixel
@@ -730,24 +704,34 @@ def solve_by_misc(problem):
         pixel_array = []
 
         for i in range(1, 9):
-            img = Image.open(problem.figures[str(i)].visualFilename)
-            img_bw = img.convert(mode='L')
-            imgLoaded = img_bw.load()
-            k = 0
-            for i in range(0, img.size[0]):
-                for j in range(0, img.size[1]):
-                    thisPixel = imgLoaded[i, j]
-                    if thisPixel == 0:
-                        k += 1
-            pixel_array.append(abs(mean_pixel-k-mean_diff))
+            option_image = Image.open(problem.figures[str(i)].visualFilename)
+            pixel_count = get_pixel_count(option_image)
+            pixel_array.append(abs(mean_pixel-pixel_count-mean_diff))
 
         if min(pixel_array) < 200:
             return pixel_array.index(min(pixel_array)) + 1
         else:
             return -1
 
-    except (RuntimeError, TypeError, NameError):
+    except BaseException:
         pass
+
+
+def get_pixel_count(image):
+    try:
+        # make the image black & white and then count the black pixels
+        image_bw = image.convert(mode='L')
+        image_loaded = image_bw.load()
+        pixel_count = 0
+        for i in range(0, image.size[0]):
+            for j in range(0, image.size[1]):
+                pixel_val = image_loaded[i, j]
+                if pixel_val == 0:
+                    pixel_count += 1
+
+        return pixel_count
+    except BaseException:
+        return -1
 
 
 def get_intersection(image_a, image_b):
@@ -759,6 +743,8 @@ def get_union(image_a, image_b):
 
 
 def find_difference(first_figure, second_figure):
+    # Reference: http://rosettacode.org/wiki/Percentage_difference_between_images#Python
+
     pairs = izip(first_figure.getdata(), second_figure.getdata())
     if len(first_figure.getbands()) == 1:
         # for gray-scale jpegs
@@ -767,7 +753,6 @@ def find_difference(first_figure, second_figure):
         dif = sum(abs(c1 - c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
 
     ncomponents = first_figure.size[0] * first_figure.size[1] * 3
-    # print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
 
     return (dif / 255.0 * 100) / ncomponents
 
