@@ -483,6 +483,9 @@ def solve_by_pixel_diff(problem):
         diff = find_difference(a_union_c, figureC_Image)
 
         if diff <= 1:
+            if find_difference(diff_ac, figureG_Image) < 1:
+                return -1
+
             final_transform = get_union(diff_ac, figureG_Image)
             diff_score_array = []
             for i in range(1, 9):
