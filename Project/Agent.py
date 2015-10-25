@@ -16,22 +16,22 @@ import math
 
 __author__ = "Bhanu Verma"
 
-figureA_Image = None
-figureB_Image = None
-figureC_Image = None
-figureD_Image = None
-figureE_Image = None
-figureF_Image = None
-figureG_Image = None
-figureH_Image = None
-figure1_Image = None
-figure2_Image = None
-figure3_Image = None
-figure4_Image = None
-figure5_Image = None
-figure6_Image = None
-figure7_Image = None
-figure8_Image = None
+image_a = None
+image_b = None
+image_c = None
+image_d = None
+image_e = None
+image_f = None
+image_g = None
+image_h = None
+image_1 = None
+image_2 = None
+image_3 = None
+image_4 = None
+image_5 = None
+image_6 = None
+image_7 = None
+image_8 = None
 
 objectlist_A = []
 objectlist_B = []
@@ -83,41 +83,41 @@ def parse_problem(key_value, object_list):
 
 
 def load_image(key_value, file_name):
-    global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
-        figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
-        figure7_Image, figure8_Image
+    global image_a, image_b, image_c, image_d, image_e, image_f, image_g, \
+        image_h, image_1, image_2, image_3, image_4, image_5, image_6, \
+        image_7, image_8
     if key_value == 'A':
-        figureA_Image = Image.open(file_name)
+        image_a = Image.open(file_name)
     if key_value == 'B':
-        figureB_Image = Image.open(file_name)
+        image_b = Image.open(file_name)
     if key_value == 'C':
-        figureC_Image = Image.open(file_name)
+        image_c = Image.open(file_name)
     if key_value == 'D':
-        figureD_Image = Image.open(file_name)
+        image_d = Image.open(file_name)
     if key_value == 'E':
-        figureE_Image = Image.open(file_name)
+        image_e = Image.open(file_name)
     if key_value == 'F':
-        figureF_Image = Image.open(file_name)
+        image_f = Image.open(file_name)
     if key_value == 'G':
-        figureG_Image = Image.open(file_name)
+        image_g = Image.open(file_name)
     if key_value == 'H':
-        figureH_Image = Image.open(file_name)
+        image_h = Image.open(file_name)
     if key_value == '1':
-        figure1_Image = Image.open(file_name)
+        image_1 = Image.open(file_name)
     if key_value == '2':
-        figure2_Image = Image.open(file_name)
+        image_2 = Image.open(file_name)
     if key_value == '3':
-        figure3_Image = Image.open(file_name)
+        image_3 = Image.open(file_name)
     if key_value == '4':
-        figure4_Image = Image.open(file_name)
+        image_4 = Image.open(file_name)
     if key_value == '5':
-        figure5_Image = Image.open(file_name)
+        image_5 = Image.open(file_name)
     if key_value == '6':
-        figure6_Image = Image.open(file_name)
+        image_6 = Image.open(file_name)
     if key_value == '7':
-        figure7_Image = Image.open(file_name)
+        image_7 = Image.open(file_name)
     if key_value == '8':
-        figure8_Image = Image.open(file_name)
+        image_8 = Image.open(file_name)
 
 
 def store_attributes(key_value, dict_objects):
@@ -443,26 +443,26 @@ def find_solution_advanced():
 def solve_by_reflection():
     try:
         value_array = []
-        transpose_a = figureA_Image.transpose(Image.FLIP_LEFT_RIGHT)
-        diff = find_difference(transpose_a, figureC_Image)
+        transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
+        diff = find_difference(transpose_a, image_c)
 
         if diff < 1:
-            transpose_g = figureG_Image.transpose(Image.FLIP_LEFT_RIGHT)
-            diff_1 = math.fabs(find_difference(transpose_g, figure1_Image) - diff)
+            transpose_g = image_g.transpose(Image.FLIP_LEFT_RIGHT)
+            diff_1 = math.fabs(find_difference(transpose_g, image_1) - diff)
             value_array.append(diff_1)
-            diff_2 = math.fabs(find_difference(transpose_g, figure2_Image) - diff)
+            diff_2 = math.fabs(find_difference(transpose_g, image_2) - diff)
             value_array.append(diff_2)
-            diff_3 = math.fabs(find_difference(transpose_g, figure3_Image) - diff)
+            diff_3 = math.fabs(find_difference(transpose_g, image_3) - diff)
             value_array.append(diff_3)
-            diff_4 = math.fabs(find_difference(transpose_g, figure4_Image) - diff)
+            diff_4 = math.fabs(find_difference(transpose_g, image_4) - diff)
             value_array.append(diff_4)
-            diff_5 = math.fabs(find_difference(transpose_g, figure5_Image) - diff)
+            diff_5 = math.fabs(find_difference(transpose_g, image_5) - diff)
             value_array.append(diff_5)
-            diff_6 = math.fabs(find_difference(transpose_g, figure6_Image) - diff)
+            diff_6 = math.fabs(find_difference(transpose_g, image_6) - diff)
             value_array.append(diff_6)
-            diff_7 = math.fabs(find_difference(transpose_g, figure7_Image) - diff)
+            diff_7 = math.fabs(find_difference(transpose_g, image_7) - diff)
             value_array.append(diff_7)
-            diff_8 = math.fabs(find_difference(transpose_g, figure8_Image) - diff)
+            diff_8 = math.fabs(find_difference(transpose_g, image_8) - diff)
             value_array.append(diff_8)
 
             return value_array.index(min(value_array)) + 1
@@ -479,15 +479,15 @@ def solve_by_reflection():
 
 def solve_by_pixel_diff(problem):
     try:
-        diff_ac = ImageChops.invert(ImageChops.difference(figureA_Image, figureC_Image))
-        a_union_c = get_union(diff_ac, figureA_Image)
-        diff = find_difference(a_union_c, figureC_Image)
+        diff_ac = ImageChops.invert(ImageChops.difference(image_a, image_c))
+        a_union_c = get_union(diff_ac, image_a)
+        diff = find_difference(a_union_c, image_c)
 
         if diff <= 1:
-            if find_difference(diff_ac, figureG_Image) < 1:
+            if find_difference(diff_ac, image_g) < 1:
                 return -1
 
-            final_transform = get_union(diff_ac, figureG_Image)
+            final_transform = get_union(diff_ac, image_g)
             diff_score_array = []
             for i in range(1, 9):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
@@ -507,29 +507,29 @@ def solve_by_pixel_diff(problem):
 def solve_by_offset(problem, flag):
     try:
         # convert to grayscale and invert
-        figureA_bw = figureA_Image.convert(mode='L')
+        figureA_bw = image_a.convert(mode='L')
         figureA_inv = ImageChops.invert(figureA_bw)
         dimA = figureA_inv.getbbox()
 
-        figureC_bw = figureC_Image.convert(mode='L')
+        figureC_bw = image_c.convert(mode='L')
         figureC_inv = ImageChops.invert(figureC_bw)
         dimC = figureC_inv.getbbox()
 
-        left_image = ImageChops.offset(figureA_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
-        right_image = ImageChops.offset(figureA_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+        left_image = ImageChops.offset(image_a, dimC[0] - dimA[0], dimC[1] - dimA[1])
+        right_image = ImageChops.offset(image_a, dimC[2] - dimA[2], dimC[3] - dimA[3])
         if flag == 0:
-            left_intersect_a = get_union(left_image, figureA_Image)
+            left_intersect_a = get_union(left_image, image_a)
             final_intersect = get_union(left_intersect_a, right_image)
         elif flag == 1:
             final_intersect = get_union(left_image, right_image)
 
-        diff = find_difference(final_intersect, figureC_Image)
+        diff = find_difference(final_intersect, image_c)
 
         if diff <= 3:
-            left_image_g = ImageChops.offset(figureG_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
-            right_image_g = ImageChops.offset(figureG_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+            left_image_g = ImageChops.offset(image_g, dimC[0] - dimA[0], dimC[1] - dimA[1])
+            right_image_g = ImageChops.offset(image_g, dimC[2] - dimA[2], dimC[3] - dimA[3])
             if flag == 0:
-                left_intersect_g = get_union(left_image_g, figureG_Image)
+                left_intersect_g = get_union(left_image_g, image_g)
                 final_transform = get_union(left_intersect_g, right_image_g)
             elif flag == 1:
                 final_transform = get_union(left_image_g, right_image_g)
@@ -555,15 +555,15 @@ def solve_by_offset(problem, flag):
 def solve_by_special_scaling(problem):
     try:
         # convert to grayscale and invert
-        figureA_bw = figureA_Image.convert(mode='L')
+        figureA_bw = image_a.convert(mode='L')
         figureA_inv = ImageChops.invert(figureA_bw)
         dimA = figureA_inv.getbbox()
 
-        figureB_bw = figureB_Image.convert(mode='L')
+        figureB_bw = image_b.convert(mode='L')
         figureB_inv = ImageChops.invert(figureB_bw)
         dimB = figureB_inv.getbbox()
 
-        figureC_bw = figureC_Image.convert(mode='L')
+        figureC_bw = image_c.convert(mode='L')
         figureC_inv = ImageChops.invert(figureC_bw)
         dimC = figureC_inv.getbbox()
 
@@ -582,12 +582,12 @@ def solve_by_special_scaling(problem):
         scalex_cb = length_c / float(length_b)
         scaley_cb = width_c / float(width_c)
 
-        scale_tuple = int(scalex_cb * scalex_ba * figureA_Image.size[0]), int(
-            scalex_cb * scalex_ba * figureA_Image.size[1])
+        scale_tuple = int(scalex_cb * scalex_ba * image_a.size[0]), int(
+            scalex_cb * scalex_ba * image_a.size[1])
 
         # find intersection between a & c
-        diff_ac = ImageChops.invert(ImageChops.difference(figureA_Image, figureC_Image))
-        ac_intersect_a = get_intersection(diff_ac, figureA_Image)
+        diff_ac = ImageChops.invert(ImageChops.difference(image_a, image_c))
+        ac_intersect_a = get_intersection(diff_ac, image_a)
 
         # resize the image
         resized_a = ac_intersect_a.resize(scale_tuple)
@@ -596,34 +596,34 @@ def solve_by_special_scaling(problem):
         scaled_length = resized_a.size[1]
 
         # find the crop box tuple
-        left_margin = (scaled_width - figureA_Image.size[0]) / 2
+        left_margin = (scaled_width - image_a.size[0]) / 2
         right_margin = scaled_width - left_margin
-        upper_margin = (scaled_length - figureA_Image.size[1]) / 2
+        upper_margin = (scaled_length - image_a.size[1]) / 2
         lower_margin = scaled_length - upper_margin
         crop_box = left_margin, upper_margin, right_margin, lower_margin
 
-        a_intersect_c = get_intersection(figureA_Image, figureC_Image)
+        a_intersect_c = get_intersection(image_a, image_c)
         cropped_a = resized_a.crop(crop_box)
 
         final_transform = get_union(a_intersect_c, cropped_a)
 
-        diff = find_difference(final_transform, figureC_Image)
+        diff = find_difference(final_transform, image_c)
 
         # now apply the transformation to solution set and check
-        result_scale = int(1.45 * figureA_Image.size[0]), int(1.45 * figureA_Image.size[1])
+        result_scale = int(1.45 * image_a.size[0]), int(1.45 * image_a.size[1])
         # 94 percent similarity
         if diff < 6:
-            g_intersect_a = ImageChops.difference(figureG_Image, figureA_Image)
+            g_intersect_a = ImageChops.difference(image_g, image_a)
             g_intersect_a = ImageChops.invert(g_intersect_a)
-            ga_intersect_g = get_intersection(g_intersect_a, figureG_Image)
+            ga_intersect_g = get_intersection(g_intersect_a, image_g)
             ga_intersect_g_resize = ga_intersect_g.resize(result_scale)
 
             scaled_width = ga_intersect_g_resize.size[0]
             scaled_length = ga_intersect_g_resize.size[1]
 
-            left_margin = (scaled_width - figureA_Image.size[0]) / 2
+            left_margin = (scaled_width - image_a.size[0]) / 2
             right_margin = scaled_width - left_margin
-            upper_margin = (scaled_length - figureA_Image.size[1]) / 2
+            upper_margin = (scaled_length - image_a.size[1]) / 2
             lower_margin = scaled_length - upper_margin
             crop_box = left_margin, upper_margin, right_margin, lower_margin
 
@@ -649,24 +649,24 @@ def solve_by_special_scaling(problem):
 
 def solve_by_rolling(problem):
     try:
-        width, length = figureA_Image.size[0], figureA_Image.size[1]
+        width, length = image_a.size[0], image_a.size[1]
 
-        left_half = figureA_Image.crop((0, 0, width/2, length))
-        right_half = figureA_Image.crop((width/2, 0, width, length))
+        left_half = image_a.crop((0, 0, width/2, length))
+        right_half = image_a.crop((width/2, 0, width, length))
 
-        final_image = figureA_Image.copy()
+        final_image = image_a.copy()
         final_image.paste(right_half, (5, 0, width/2+5, length))
         final_image.paste(left_half, (width/2-5, 0, width-5, length))
 
-        diff = find_difference(final_image, figureC_Image)
+        diff = find_difference(final_image, image_c)
 
         if diff <= 2:
-            width, length = figureG_Image.size[0], figureG_Image.size[1]
+            width, length = image_g.size[0], image_g.size[1]
 
-            left_half = figureG_Image.crop((0, 0, width/2, length))
-            right_half = figureG_Image.crop((width/2, 0, width, length))
+            left_half = image_g.crop((0, 0, width/2, length))
+            right_half = image_g.crop((width/2, 0, width, length))
 
-            final_transform = figureG_Image.copy()
+            final_transform = image_g.copy()
             final_transform.paste(right_half, (0, 0, width/2, length))
             final_transform.paste(left_half, (width/2, 0, width, length))
 
@@ -687,10 +687,10 @@ def solve_by_rolling(problem):
 
 def solve_by_misc(problem):
     try:
-        c_pixel = get_pixel_count(figureC_Image)
-        f_pixel = get_pixel_count(figureF_Image)
-        g_pixel = get_pixel_count(figureG_Image)
-        h_pixel = get_pixel_count(figureH_Image)
+        c_pixel = get_pixel_count(image_c)
+        f_pixel = get_pixel_count(image_f)
+        g_pixel = get_pixel_count(image_g)
+        h_pixel = get_pixel_count(image_h)
 
         if c_pixel == -1 or f_pixel == -1 or g_pixel == -1 or h_pixel == -1:
             return -1
