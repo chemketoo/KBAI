@@ -506,7 +506,8 @@ def solve_by_special_scaling(problem):
         scalex_cb = length_c / float(length_b)
         scaley_cb = width_c / float(width_c)
 
-        scale_tuple = int(scalex_cb * scalex_ba * figureA_Image.size[0]), int(scalex_cb * scalex_ba * figureA_Image.size[1])
+        scale_tuple = int(scalex_cb * scalex_ba * figureA_Image.size[0]), int(
+            scalex_cb * scalex_ba * figureA_Image.size[1])
 
         # find intersection between a & c
         diff_ac = ImageChops.invert(ImageChops.difference(figureA_Image, figureC_Image))
@@ -544,9 +545,9 @@ def solve_by_special_scaling(problem):
             scaled_width = ga_intersect_g_resize.size[0]
             scaled_length = ga_intersect_g_resize.size[1]
 
-            left_margin = (scaled_width - figureA_Image.size[0])/2
+            left_margin = (scaled_width - figureA_Image.size[0]) / 2
             right_margin = scaled_width - left_margin
-            upper_margin = (scaled_length - figureA_Image.size[1])/2
+            upper_margin = (scaled_length - figureA_Image.size[1]) / 2
             lower_margin = scaled_length - upper_margin
             crop_box = left_margin, upper_margin, right_margin, lower_margin
 
@@ -560,6 +561,57 @@ def solve_by_special_scaling(problem):
                 diff_score_array.append(diff_score)
 
             return diff_score_array.index(min(diff_score_array)) + 1
+
+    except (RuntimeError, TypeError, NameError):
+        print "Error Caught"
+
+    return -1
+
+
+    # TODO: normal scaling
+
+
+def solve_by_offset(problem, flag):
+    try:
+        # convert to grayscale and invert
+        figureA_bw = figureA_Image.convert(mode='L')
+        figureA_inv = ImageChops.invert(figureA_bw)
+        dimA = figureA_inv.getbbox()
+
+        figureC_bw = figureC_Image.convert(mode='L')
+        figureC_inv = ImageChops.invert(figureC_bw)
+        dimC = figureC_inv.getbbox()
+
+        left_image = ImageChops.offset(figureA_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
+        right_image = ImageChops.offset(figureA_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+        if flag == 0:
+            left_intersect_a = get_union(left_image, figureA_Image)
+            final_intersect = get_union(left_intersect_a, right_image)
+        elif flag == 1:
+            final_intersect = get_union(left_image, right_image)
+
+        diff = find_difference(final_intersect, figureC_Image)
+
+        if diff <= 3:
+            left_image_g = ImageChops.offset(figureG_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
+            right_image_g = ImageChops.offset(figureG_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+            if flag == 0:
+                left_intersect_g = get_union(left_image_g, figureG_Image)
+                final_transform = get_union(left_intersect_g, right_image_g)
+            elif flag == 1:
+                final_transform = get_union(left_image_g, right_image_g)
+
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(final_transform, result_option)
+                diff_score_array.append(diff_score)
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            if flag == 1:
+                return -1
+            else:
+                return solve_by_offset(problem, 1)
 
     except (RuntimeError, TypeError, NameError):
         print "Error Caught"
@@ -907,6 +959,7 @@ class Agent:
                 print "Hmmm, this looks tricky. I would skip this problem." + "\n"
             return i
         elif problem.problemType == '3x3':
+            # TODO:write code for vertical symmetry
             prob = problem.figures
             for key, value in sorted(prob.iteritems()):
                 figure = prob[key]
@@ -914,12 +967,22 @@ class Agent:
                 load_image(key, file_name)
             i = solve_by_reflection()
             if i == -1:
-                i = solve_by_special_scaling(problem)
+                i = solve_by_offset(problem, 0)
+                if i == -1:
+                    i = solve_by_special_scaling(problem)
+                    if i == -1:
+                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                        return -1
+                    else:
+                        return i
+                else:
+                    return i
                 if i == -1:
                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
                     return -1
                 else:
                     return i
+
             else:
                 return i
         else:
