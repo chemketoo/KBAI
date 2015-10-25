@@ -678,64 +678,63 @@ def solve_by_rolling(problem):
 
     return -1
 
+
 def solve_by_misc(problem):
     figureC_bw = figureC_Image.convert(mode='L')
-    figureC_in = ImageChops.invert(figureC_bw)
-    figureCLoaded = figureC_in.load()
+    figureCLoaded = figureC_bw.load()
     c_pixel = 0
     for i in range(0, figureC_Image.size[0]):
         for j in range(0, figureC_Image.size[1]):
             thisPixel = figureCLoaded[i, j]
-            if thisPixel == 255:
+            if thisPixel == 0:
                 c_pixel += 1
 
     figureF_bw = figureF_Image.convert(mode='L')
-    figureF_in = ImageChops.invert(figureF_bw)
-    figureFLoaded = figureF_in.load()
+    figureFLoaded = figureF_bw.load()
     f_pixel = 0
     for i in range(0, figureF_Image.size[0]):
         for j in range(0, figureF_Image.size[1]):
             thisPixel = figureFLoaded[i, j]
-            if thisPixel == 255:
+            if thisPixel == 0:
                 f_pixel += 1
 
     figureG_bw = figureG_Image.convert(mode='L')
-    figureG_in = ImageChops.invert(figureG_bw)
-    figureGLoaded = figureG_in.load()
+    figureGLoaded = figureG_bw.load()
     g_pixel = 0
     for i in range(0, figureG_Image.size[0]):
         for j in range(0, figureG_Image.size[1]):
             thisPixel = figureGLoaded[i, j]
-            if thisPixel == 255:
+            if thisPixel == 0:
                 g_pixel += 1
 
     figureH_bw = figureH_Image.convert(mode='L')
-    figureH_in = ImageChops.invert(figureH_bw)
-    figureHLoaded = figureH_in.load()
+    figureHLoaded = figureH_bw.load()
     h_pixel = 0
     for i in range(0, figureH_Image.size[0]):
         for j in range(0, figureH_Image.size[1]):
             thisPixel = figureHLoaded[i, j]
-            if thisPixel == 255:
+            if thisPixel == 0:
                 h_pixel += 1
+
+    # print c_pixel, f_pixel
+    # print g_pixel, h_pixel
 
     diff1 = abs(c_pixel - f_pixel)
     diff2 = abs(g_pixel - h_pixel)
 
     mean_diff = (diff1 + diff2)/2
-
+    # print mean_diff
     pixel_array = []
 
     for i in range(1, 9):
         img = Image.open(problem.figures[str(i)].visualFilename)
         img_bw = img.convert(mode='L')
-        img_in = ImageChops.invert(img_bw)
-        imgLoaded = img_in.load()
+        imgLoaded = img_bw.load()
         k = 0
         for i in range(0, img.size[0]):
             for j in range(0, img.size[1]):
                 thisPixel = imgLoaded[i, j]
-                if thisPixel == 255:
+                if thisPixel == 0:
                     k += 1
         pixel_array.append(abs(mean_diff-k))
 
@@ -743,6 +742,7 @@ def solve_by_misc(problem):
         return pixel_array.index(min(pixel_array)) + 1
     else:
         return -1
+
 
 def get_intersection(image_a, image_b):
     return ImageChops.lighter(image_a, image_b)
