@@ -10,7 +10,7 @@
 
 # Install Pillow and uncomment this line to access image processing.
 
-from PIL import Image
+from PIL import Image, ImageChops
 from itertools import izip
 import math
 
@@ -473,13 +473,115 @@ def solve_by_reflection():
         return -1
 
 
+        # TODO: normal scaling
+
+
+def solve_by_special_scaling(problem):
+    try:
+        # convert to grayscale and invert
+        figureA_bw = figureA_Image.convert(mode='L')
+        figureA_inv = ImageChops.invert(figureA_bw)
+        dimA = figureA_inv.getbbox()
+
+        figureB_bw = figureB_Image.convert(mode='L')
+        figureB_inv = ImageChops.invert(figureB_bw)
+        dimB = figureB_inv.getbbox()
+
+        figureC_bw = figureC_Image.convert(mode='L')
+        figureC_inv = ImageChops.invert(figureC_bw)
+        dimC = figureC_inv.getbbox()
+
+        # calculate lengths of a,b & c
+        length_a = dimA[2] - dimA[0]
+        width_a = dimA[3] - dimA[1]
+        length_b = dimB[2] - dimB[0]
+        width_b = dimB[3] - dimB[1]
+        length_c = dimC[2] - dimC[0]
+        width_c = dimC[3] - dimC[1]
+
+        # find scale tuple
+        scalex_ba = length_b / float(length_a)
+        scaley_ba = width_b / float(width_a)
+
+        scalex_cb = length_c / float(length_b)
+        scaley_cb = width_c / float(width_c)
+
+        scale_tuple = int(scalex_cb * scalex_ba * figureA_Image.size[0]), int(scalex_cb * scalex_ba * figureA_Image.size[1])
+
+        # find intersection between a & c
+        diff_ac = ImageChops.invert(ImageChops.difference(figureA_Image, figureC_Image))
+        ac_intersect_a = get_intersection(diff_ac, figureA_Image)
+
+        # resize the image
+        resized_a = ac_intersect_a.resize(scale_tuple)
+
+        scaled_width = resized_a.size[0]
+        scaled_length = resized_a.size[1]
+
+        # find the crop box tuple
+        left_margin = (scaled_width - figureA_Image.size[0]) / 2
+        right_margin = scaled_width - left_margin
+        upper_margin = (scaled_length - figureA_Image.size[1]) / 2
+        lower_margin = scaled_length - upper_margin
+        crop_box = left_margin, upper_margin, right_margin, lower_margin
+
+        a_intersect_c = get_intersection(figureA_Image, figureC_Image)
+        cropped_a = resized_a.crop(crop_box)
+
+        final_transform = get_union(a_intersect_c, cropped_a)
+
+        diff = find_difference(final_transform, figureC_Image)
+
+        # now apply the transformation to solution set and check
+        result_scale = int(1.45 * figureA_Image.size[0]), int(1.45 * figureA_Image.size[1])
+        # 94 percent similarity
+        if diff < 6:
+            g_intersect_a = ImageChops.difference(figureG_Image, figureA_Image)
+            g_intersect_a = ImageChops.invert(g_intersect_a)
+            ga_intersect_g = get_intersection(g_intersect_a, figureG_Image)
+            ga_intersect_g_resize = ga_intersect_g.resize(result_scale)
+
+            scaled_width = ga_intersect_g_resize.size[0]
+            scaled_length = ga_intersect_g_resize.size[1]
+
+            left_margin = (scaled_width - figureA_Image.size[0])/2
+            right_margin = scaled_width - left_margin
+            upper_margin = (scaled_length - figureA_Image.size[1])/2
+            lower_margin = scaled_length - upper_margin
+            crop_box = left_margin, upper_margin, right_margin, lower_margin
+
+            cropped_g = ga_intersect_g_resize.crop(crop_box)
+            result_final_transform = get_union(a_intersect_c, cropped_g)
+
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(result_final_transform, result_option)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+
+    except (RuntimeError, TypeError, NameError):
+        print "Error Caught"
+
+    return -1
+
+
+def get_intersection(image_a, image_b):
+    return ImageChops.lighter(image_a, image_b)
+
+
+def get_union(image_a, image_b):
+    return ImageChops.darker(image_a, image_b)
+
+
 def find_difference(first_figure, second_figure):
     pairs = izip(first_figure.getdata(), second_figure.getdata())
     if len(first_figure.getbands()) == 1:
         # for gray-scale jpegs
-        dif = sum(abs(p1-p2) for p1, p2 in pairs)
+        dif = sum(abs(p1 - p2) for p1, p2 in pairs)
     else:
-        dif = sum(abs(c1-c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
+        dif = sum(abs(c1 - c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
 
     ncomponents = first_figure.size[0] * first_figure.size[1] * 3
     # print "Difference (percentage):", (dif / 255.0 * 100) / ncomponents
@@ -812,8 +914,12 @@ class Agent:
                 load_image(key, file_name)
             i = solve_by_reflection()
             if i == -1:
-                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                return i
+                i = solve_by_special_scaling(problem)
+                if i == -1:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                    return -1
+                else:
+                    return i
             else:
                 return i
         else:
