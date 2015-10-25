@@ -643,6 +643,39 @@ def solve_by_special_scaling(problem):
     # TODO: normal scaling
 
 
+def solve_by_rolling(problem):
+    width, length = figureA_Image.size[0], figureA_Image.size[1]
+
+    left_half = figureA_Image.crop((0, 0, width/2, length))
+    right_half = figureA_Image.crop((width/2, 0, width, length))
+
+    final_image = figureA_Image.copy()
+    final_image.paste(right_half, (5, 0, width/2+5, length))
+    final_image.paste(left_half, (width/2-5, 0, width-5, length))
+
+    diff = find_difference(final_image, figureC_Image)
+
+    if diff <= 2:
+        width, length = figureG_Image.size[0], figureG_Image.size[1]
+
+        left_half = figureG_Image.crop((0, 0, width/2, length))
+        right_half = figureG_Image.crop((width/2, 0, width, length))
+
+        final_transform = figureG_Image.copy()
+        final_transform.paste(right_half, (0, 0, width/2, length))
+        final_transform.paste(left_half, (width/2, 0, width, length))
+
+        diff_score_array = []
+        for i in range(1, 9):
+            result_option = Image.open(problem.figures[str(i)].visualFilename)
+            diff_score = find_difference(final_transform, result_option)
+            diff_score_array.append(diff_score)
+
+        return diff_score_array.index(min(diff_score_array)) + 1
+
+    return -1
+
+
 def get_intersection(image_a, image_b):
     return ImageChops.lighter(image_a, image_b)
 
@@ -997,8 +1030,12 @@ class Agent:
                     if i == -1:
                         i = solve_by_special_scaling(problem)
                         if i == -1:
-                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                            return -1
+                            i = solve_by_rolling(problem)
+                            if i == -1:
+                                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                return -1
+                            else:
+                                return i
                         else:
                             return i
                     else:
