@@ -721,14 +721,12 @@ def solve_by_misc(problem):
                 if thisPixel == 0:
                     h_pixel += 1
 
-        # print c_pixel, f_pixel
-        # print g_pixel, h_pixel
-
-        diff1 = abs(c_pixel - f_pixel)
-        diff2 = abs(g_pixel - h_pixel)
+        diff1 = c_pixel - f_pixel
+        diff2 = g_pixel - h_pixel
 
         mean_diff = (diff1 + diff2)/2
-        # print mean_diff
+        mean_pixel = (f_pixel + h_pixel)/2
+
         pixel_array = []
 
         for i in range(1, 9):
@@ -741,9 +739,9 @@ def solve_by_misc(problem):
                     thisPixel = imgLoaded[i, j]
                     if thisPixel == 0:
                         k += 1
-            pixel_array.append(abs(mean_diff-k))
+            pixel_array.append(abs(mean_pixel-k-mean_diff))
 
-        if min(pixel_array) < 500:
+        if min(pixel_array) < 200:
             return pixel_array.index(min(pixel_array)) + 1
         else:
             return -1
