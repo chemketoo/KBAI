@@ -476,6 +476,78 @@ def solve_by_reflection():
         # TODO: normal scaling
 
 
+def solve_by_pixel_diff(problem):
+    try:
+        diff_ac = ImageChops.invert(ImageChops.difference(figureA_Image, figureC_Image))
+        a_union_c = get_union(diff_ac, figureA_Image)
+        diff = find_difference(a_union_c, figureC_Image)
+
+        if diff <= 1:
+            final_transform = get_union(diff_ac, figureG_Image)
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(final_transform, result_option)
+                diff_score_array.append(diff_score)
+            if min(diff_score_array) < 1.5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+
+    except (RuntimeError, TypeError, NameError):
+        print "Error Caught"
+
+    return -1
+
+
+def solve_by_offset(problem, flag):
+    try:
+        # convert to grayscale and invert
+        figureA_bw = figureA_Image.convert(mode='L')
+        figureA_inv = ImageChops.invert(figureA_bw)
+        dimA = figureA_inv.getbbox()
+
+        figureC_bw = figureC_Image.convert(mode='L')
+        figureC_inv = ImageChops.invert(figureC_bw)
+        dimC = figureC_inv.getbbox()
+
+        left_image = ImageChops.offset(figureA_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
+        right_image = ImageChops.offset(figureA_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+        if flag == 0:
+            left_intersect_a = get_union(left_image, figureA_Image)
+            final_intersect = get_union(left_intersect_a, right_image)
+        elif flag == 1:
+            final_intersect = get_union(left_image, right_image)
+
+        diff = find_difference(final_intersect, figureC_Image)
+
+        if diff <= 3:
+            left_image_g = ImageChops.offset(figureG_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
+            right_image_g = ImageChops.offset(figureG_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
+            if flag == 0:
+                left_intersect_g = get_union(left_image_g, figureG_Image)
+                final_transform = get_union(left_intersect_g, right_image_g)
+            elif flag == 1:
+                final_transform = get_union(left_image_g, right_image_g)
+
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(final_transform, result_option)
+                diff_score_array.append(diff_score)
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            if flag == 1:
+                return -1
+            else:
+                return solve_by_offset(problem, 1)
+
+    except (RuntimeError, TypeError, NameError):
+        print "Error Caught"
+
+    return -1
+
+
 def solve_by_special_scaling(problem):
     try:
         # convert to grayscale and invert
@@ -569,54 +641,6 @@ def solve_by_special_scaling(problem):
 
 
     # TODO: normal scaling
-
-
-def solve_by_offset(problem, flag):
-    try:
-        # convert to grayscale and invert
-        figureA_bw = figureA_Image.convert(mode='L')
-        figureA_inv = ImageChops.invert(figureA_bw)
-        dimA = figureA_inv.getbbox()
-
-        figureC_bw = figureC_Image.convert(mode='L')
-        figureC_inv = ImageChops.invert(figureC_bw)
-        dimC = figureC_inv.getbbox()
-
-        left_image = ImageChops.offset(figureA_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
-        right_image = ImageChops.offset(figureA_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
-        if flag == 0:
-            left_intersect_a = get_union(left_image, figureA_Image)
-            final_intersect = get_union(left_intersect_a, right_image)
-        elif flag == 1:
-            final_intersect = get_union(left_image, right_image)
-
-        diff = find_difference(final_intersect, figureC_Image)
-
-        if diff <= 3:
-            left_image_g = ImageChops.offset(figureG_Image, dimC[0] - dimA[0], dimC[1] - dimA[1])
-            right_image_g = ImageChops.offset(figureG_Image, dimC[2] - dimA[2], dimC[3] - dimA[3])
-            if flag == 0:
-                left_intersect_g = get_union(left_image_g, figureG_Image)
-                final_transform = get_union(left_intersect_g, right_image_g)
-            elif flag == 1:
-                final_transform = get_union(left_image_g, right_image_g)
-
-            diff_score_array = []
-            for i in range(1, 9):
-                result_option = Image.open(problem.figures[str(i)].visualFilename)
-                diff_score = find_difference(final_transform, result_option)
-                diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
-        else:
-            if flag == 1:
-                return -1
-            else:
-                return solve_by_offset(problem, 1)
-
-    except (RuntimeError, TypeError, NameError):
-        print "Error Caught"
-
-    return -1
 
 
 def get_intersection(image_a, image_b):
@@ -967,22 +991,20 @@ class Agent:
                 load_image(key, file_name)
             i = solve_by_reflection()
             if i == -1:
-                i = solve_by_offset(problem, 0)
+                i = solve_by_pixel_diff(problem)
                 if i == -1:
-                    i = solve_by_special_scaling(problem)
+                    i = solve_by_offset(problem, 0)
                     if i == -1:
-                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                        return -1
+                        i = solve_by_special_scaling(problem)
+                        if i == -1:
+                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                            return -1
+                        else:
+                            return i
                     else:
                         return i
                 else:
                     return i
-                if i == -1:
-                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                    return -1
-                else:
-                    return i
-
             else:
                 return i
         else:
