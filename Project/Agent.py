@@ -1112,5 +1112,5 @@ class Agent:
                                     return i
             return i
         else:
-            print "My creator has not equipped me to handle 3x3 problems yet. I would skip this problem." + "\n"
+            print "My creator has not equipped me to handle such problems yet. I would skip this problem." + "\n"
             return -1
