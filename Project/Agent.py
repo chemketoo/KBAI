@@ -441,36 +441,40 @@ def find_solution_advanced():
 
 
 def solve_by_reflection():
-    global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
-        figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
-        figure7_Image, figure8_Image
+    try:
+        global figureA_Image, figureB_Image, figureC_Image, figureD_Image, figureE_Image, figureF_Image, figureG_Image, \
+            figureH_Image, figure1_Image, figure2_Image, figure3_Image, figure4_Image, figure5_Image, figure6_Image, \
+            figure7_Image, figure8_Image
 
-    value_array = []
-    transpose_a = figureA_Image.transpose(Image.FLIP_LEFT_RIGHT)
-    diff = find_difference(transpose_a, figureC_Image)
+        value_array = []
+        transpose_a = figureA_Image.transpose(Image.FLIP_LEFT_RIGHT)
+        diff = find_difference(transpose_a, figureC_Image)
 
-    if diff < 1:
-        transpose_g = figureG_Image.transpose(Image.FLIP_LEFT_RIGHT)
-        diff_1 = math.fabs(find_difference(transpose_g, figure1_Image) - diff)
-        value_array.append(diff_1)
-        diff_2 = math.fabs(find_difference(transpose_g, figure2_Image) - diff)
-        value_array.append(diff_2)
-        diff_3 = math.fabs(find_difference(transpose_g, figure3_Image) - diff)
-        value_array.append(diff_3)
-        diff_4 = math.fabs(find_difference(transpose_g, figure4_Image) - diff)
-        value_array.append(diff_4)
-        diff_5 = math.fabs(find_difference(transpose_g, figure5_Image) - diff)
-        value_array.append(diff_5)
-        diff_6 = math.fabs(find_difference(transpose_g, figure6_Image) - diff)
-        value_array.append(diff_6)
-        diff_7 = math.fabs(find_difference(transpose_g, figure7_Image) - diff)
-        value_array.append(diff_7)
-        diff_8 = math.fabs(find_difference(transpose_g, figure8_Image) - diff)
-        value_array.append(diff_8)
+        if diff < 1:
+            transpose_g = figureG_Image.transpose(Image.FLIP_LEFT_RIGHT)
+            diff_1 = math.fabs(find_difference(transpose_g, figure1_Image) - diff)
+            value_array.append(diff_1)
+            diff_2 = math.fabs(find_difference(transpose_g, figure2_Image) - diff)
+            value_array.append(diff_2)
+            diff_3 = math.fabs(find_difference(transpose_g, figure3_Image) - diff)
+            value_array.append(diff_3)
+            diff_4 = math.fabs(find_difference(transpose_g, figure4_Image) - diff)
+            value_array.append(diff_4)
+            diff_5 = math.fabs(find_difference(transpose_g, figure5_Image) - diff)
+            value_array.append(diff_5)
+            diff_6 = math.fabs(find_difference(transpose_g, figure6_Image) - diff)
+            value_array.append(diff_6)
+            diff_7 = math.fabs(find_difference(transpose_g, figure7_Image) - diff)
+            value_array.append(diff_7)
+            diff_8 = math.fabs(find_difference(transpose_g, figure8_Image) - diff)
+            value_array.append(diff_8)
 
-        return value_array.index(min(value_array)) + 1
-    else:
-        return -1
+            return value_array.index(min(value_array)) + 1
+        else:
+            return -1
+
+    except (RuntimeError, TypeError, NameError):
+        pass
 
 
         # TODO: normal scaling
@@ -498,7 +502,7 @@ def solve_by_pixel_diff(problem):
                 return -1
 
     except (RuntimeError, TypeError, NameError):
-        print "Error Caught"
+        pass
 
     return -1
 
@@ -546,7 +550,7 @@ def solve_by_offset(problem, flag):
                 return solve_by_offset(problem, 1)
 
     except (RuntimeError, TypeError, NameError):
-        print "Error Caught"
+        pass
 
     return -1
 
@@ -638,7 +642,7 @@ def solve_by_special_scaling(problem):
             return diff_score_array.index(min(diff_score_array)) + 1
 
     except (RuntimeError, TypeError, NameError):
-        print "Error Caught"
+        pass
 
     return -1
 
@@ -680,68 +684,72 @@ def solve_by_rolling(problem):
 
 
 def solve_by_misc(problem):
-    figureC_bw = figureC_Image.convert(mode='L')
-    figureCLoaded = figureC_bw.load()
-    c_pixel = 0
-    for i in range(0, figureC_Image.size[0]):
-        for j in range(0, figureC_Image.size[1]):
-            thisPixel = figureCLoaded[i, j]
-            if thisPixel == 0:
-                c_pixel += 1
-
-    figureF_bw = figureF_Image.convert(mode='L')
-    figureFLoaded = figureF_bw.load()
-    f_pixel = 0
-    for i in range(0, figureF_Image.size[0]):
-        for j in range(0, figureF_Image.size[1]):
-            thisPixel = figureFLoaded[i, j]
-            if thisPixel == 0:
-                f_pixel += 1
-
-    figureG_bw = figureG_Image.convert(mode='L')
-    figureGLoaded = figureG_bw.load()
-    g_pixel = 0
-    for i in range(0, figureG_Image.size[0]):
-        for j in range(0, figureG_Image.size[1]):
-            thisPixel = figureGLoaded[i, j]
-            if thisPixel == 0:
-                g_pixel += 1
-
-    figureH_bw = figureH_Image.convert(mode='L')
-    figureHLoaded = figureH_bw.load()
-    h_pixel = 0
-    for i in range(0, figureH_Image.size[0]):
-        for j in range(0, figureH_Image.size[1]):
-            thisPixel = figureHLoaded[i, j]
-            if thisPixel == 0:
-                h_pixel += 1
-
-    # print c_pixel, f_pixel
-    # print g_pixel, h_pixel
-
-    diff1 = abs(c_pixel - f_pixel)
-    diff2 = abs(g_pixel - h_pixel)
-
-    mean_diff = (diff1 + diff2)/2
-    # print mean_diff
-    pixel_array = []
-
-    for i in range(1, 9):
-        img = Image.open(problem.figures[str(i)].visualFilename)
-        img_bw = img.convert(mode='L')
-        imgLoaded = img_bw.load()
-        k = 0
-        for i in range(0, img.size[0]):
-            for j in range(0, img.size[1]):
-                thisPixel = imgLoaded[i, j]
+    try:
+        figureC_bw = figureC_Image.convert(mode='L')
+        figureCLoaded = figureC_bw.load()
+        c_pixel = 0
+        for i in range(0, figureC_Image.size[0]):
+            for j in range(0, figureC_Image.size[1]):
+                thisPixel = figureCLoaded[i, j]
                 if thisPixel == 0:
-                    k += 1
-        pixel_array.append(abs(mean_diff-k))
+                    c_pixel += 1
 
-    if min(pixel_array) < 500:
-        return pixel_array.index(min(pixel_array)) + 1
-    else:
-        return -1
+        figureF_bw = figureF_Image.convert(mode='L')
+        figureFLoaded = figureF_bw.load()
+        f_pixel = 0
+        for i in range(0, figureF_Image.size[0]):
+            for j in range(0, figureF_Image.size[1]):
+                thisPixel = figureFLoaded[i, j]
+                if thisPixel == 0:
+                    f_pixel += 1
+
+        figureG_bw = figureG_Image.convert(mode='L')
+        figureGLoaded = figureG_bw.load()
+        g_pixel = 0
+        for i in range(0, figureG_Image.size[0]):
+            for j in range(0, figureG_Image.size[1]):
+                thisPixel = figureGLoaded[i, j]
+                if thisPixel == 0:
+                    g_pixel += 1
+
+        figureH_bw = figureH_Image.convert(mode='L')
+        figureHLoaded = figureH_bw.load()
+        h_pixel = 0
+        for i in range(0, figureH_Image.size[0]):
+            for j in range(0, figureH_Image.size[1]):
+                thisPixel = figureHLoaded[i, j]
+                if thisPixel == 0:
+                    h_pixel += 1
+
+        # print c_pixel, f_pixel
+        # print g_pixel, h_pixel
+
+        diff1 = abs(c_pixel - f_pixel)
+        diff2 = abs(g_pixel - h_pixel)
+
+        mean_diff = (diff1 + diff2)/2
+        # print mean_diff
+        pixel_array = []
+
+        for i in range(1, 9):
+            img = Image.open(problem.figures[str(i)].visualFilename)
+            img_bw = img.convert(mode='L')
+            imgLoaded = img_bw.load()
+            k = 0
+            for i in range(0, img.size[0]):
+                for j in range(0, img.size[1]):
+                    thisPixel = imgLoaded[i, j]
+                    if thisPixel == 0:
+                        k += 1
+            pixel_array.append(abs(mean_diff-k))
+
+        if min(pixel_array) < 500:
+            return pixel_array.index(min(pixel_array)) + 1
+        else:
+            return -1
+
+    except (RuntimeError, TypeError, NameError):
+        pass
 
 
 def get_intersection(image_a, image_b):
