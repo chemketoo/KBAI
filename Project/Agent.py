@@ -122,7 +122,8 @@ def load_image(key_value, file_name):
 
 def store_attributes(key_value, dict_objects):
     global objectlist_A, objectlist_B, objectlist_C, objectlist_D, objectlist_E, objectlist_F, objectlist_G, \
-        objectlist_H, objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6, objectlist_7, objectlist_8
+        objectlist_H, objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6, \
+        objectlist_7, objectlist_8
     if key_value == 'A':
         objectlist_A.append(dict_objects)
     if key_value == 'B':
@@ -159,288 +160,7 @@ def store_attributes(key_value, dict_objects):
         # Check A & C and apply to B and solution set
 
 
-def map_vertically_advanced():
-    rule_diff = []
-    temprule_diff = []
-    ref_rules = {'shape': [],  #
-                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
-                 'fill': ['no', 'yes'],
-                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
-                 'inside': [],
-                 'above': [],
-                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': [],
-                 'transform': ['add', 'remove'],
-                 'left-of': [],
-                 'height': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],
-                 'width': ['very small', 'small', 'medium', 'large', 'very large', 'huge']
-                 }
-
-    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
-
-    rule_length = max(len(objectlist_A), len(objectlist_C))
-
-    for i in range(rule_length):
-        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                          'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
-
-    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
-    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-    i = 0
-    for dict_A in objectlist_A:
-        for keyA, valueA in iter(sorted(dict_A.items())):
-            if keyA != 'name':
-                j = 0
-                for dict_C in objectlist_C:
-                    for keyC, valueC in iter(sorted(dict_C.items())):
-                        if keyC != 'name':
-                            if valueA not in ref_rules[keyA]:
-                                if keyA != 'inside' and keyA != 'above':
-                                    ref_rules[keyA].append(valueA)
-                            if valueC not in ref_rules[keyC]:
-                                if keyC != 'inside' and keyC != 'above':
-                                    ref_rules[keyC].append(valueC)
-                            if keyA == keyC and i == j:
-                                if keyA == 'inside' or keyA == 'above':
-                                    rule_diff[j][keyA] = len(valueA) - len(valueC)
-                                else:
-                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyC].index(valueC)
-                    j += 1
-        i += 1
-
-    rule_add_count = -1
-    rule_remove_count = -1
-    if i > j:
-        rule_remove_count = i - j
-        for itr in range(j, i):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'remove'
-
-    if i < j:
-        rule_add_count = j - i
-        for itr in range(i, j):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'add'
-
-    solution_index = 0
-
-    for number_list in solution_list:
-        solution_index += 1
-        del temprule_diff[:]
-        temprule_length = max(len(objectlist_B), len(number_list))
-        for i in range(temprule_length):
-            temprule_diff.append(
-                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
-
-        # number_list.sort(lambda x, y: cmp(len(x), len(y)))
-        # objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-        i = 0
-        for dict_B in objectlist_B:
-            for keyB, valueB in iter(sorted(dict_B.items())):
-                if keyB != 'name':
-                    j = 0
-                    for dict_N in number_list:
-                        for keyN, valueN in iter(sorted(dict_N.items())):
-                            if keyN != 'name':
-                                if valueB not in ref_rules[keyB]:
-                                    if keyB != 'inside' and keyB != 'above':
-                                        ref_rules[keyB].append(valueB)
-                                if valueN not in ref_rules[keyN]:
-                                    if keyN != 'inside' and keyN != 'above':
-                                        ref_rules[keyN].append(valueN)
-                                if keyB == keyN and i == j:
-                                    if keyB == 'inside' or keyB == 'above':
-                                        temprule_diff[j][keyB] = len(valueB) - len(valueN)
-                                    else:
-                                        temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
-                                            valueN)
-                        j += 1
-            i += 1
-
-        temprule_add_count = -1
-        temprule_remove_count = -1
-        if i > j:
-            temprule_remove_count = i - j
-            for itr in range(j, i):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'remove'
-
-        if i < j:
-            temprule_add_count = j - i
-            for itr in range(i, j):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'add'
-
-        match = True
-        for index in range(min(len(rule_diff), len(temprule_diff))):
-            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
-                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
-                break
-            if cmp(rule_diff[index], temprule_diff[index]) != 0:
-                match = False
-                break
-        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
-            return solution_index
-
-    return -1
-
-
-def find_solution_advanced():
-    rule_diff = []
-    temprule_diff = []
-    ref_rules = {'shape': [],  #
-                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
-                 'fill': ['no', 'yes'],
-                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
-                 'inside': [],
-                 'above': [],
-                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': [],
-                 'transform': ['add', 'remove'],
-                 'left-of': [],
-                 'height': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],
-                 'width': ['very small', 'small', 'medium', 'large', 'very large', 'huge']
-                 }
-
-    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6, objectlist_7,
-                     objectlist_8]
-
-    rule_length = max(len(objectlist_A), len(objectlist_B))
-
-    for i in range(rule_length):
-        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                          'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
-
-    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
-    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-    i = 0
-    print len(objectlist_A)
-    print len(objectlist_B)
-    for dict_A in objectlist_A:
-        for keyA, valueA in iter(sorted(dict_A.items())):
-            if keyA != 'name':
-                j = 0
-                for dict_B in objectlist_B:
-                    for keyB, valueB in iter(sorted(dict_B.items())):
-                        if keyB != 'name':
-                            if valueA not in ref_rules[keyA]:
-                                if keyA != 'inside' and keyA != 'above':
-                                    ref_rules[keyA].append(valueA)
-                            if valueB not in ref_rules[keyB]:
-                                if keyB != 'inside' and keyB != 'above':
-                                    ref_rules[keyB].append(valueB)
-                            if keyA == keyB and i == j:
-                                if keyA == 'inside' or keyA == 'above':
-                                    rule_diff[j][keyA] = len(valueA) - len(valueB)
-                                else:
-                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
-                                        keyB].index(valueB)
-                    j += 1
-        i += 1
-
-    rule_add_count = -1
-    rule_remove_count = -1
-    if i > j:
-        rule_remove_count = i - j
-        for itr in range(j, i):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'remove'
-
-    if i < j:
-        rule_add_count = j - i
-        for itr in range(i, j):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'add'
-
-    solution_index = 0
-
-    for number_list in solution_list:
-        solution_index += 1
-        del temprule_diff[:]
-        temprule_length = max(len(objectlist_C), len(number_list))
-        for i in range(temprule_length):
-            temprule_diff.append(
-                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': '', 'transform': '', 'left-of': '', 'height': 0, 'width': 0})
-
-        number_list.sort(lambda x, y: cmp(len(x), len(y)))
-        objectlist_C.sort(lambda x, y: cmp(len(x), len(y)))
-
-        i = 0
-        for dict_C in objectlist_C:
-            for keyC, valueC in iter(sorted(dict_C.items())):
-                if keyC != 'name':
-                    j = 0
-                    for dict_N in number_list:
-                        for keyN, valueN in iter(sorted(dict_N.items())):
-                            if keyN != 'name':
-                                if valueC not in ref_rules[keyC]:
-                                    if keyC != 'inside' and keyC != 'above':
-                                        ref_rules[keyC].append(valueC)
-                                if valueN not in ref_rules[keyN]:
-                                    if keyN != 'inside' and keyN != 'above':
-                                        ref_rules[keyN].append(valueN)
-                                if keyC == keyN and i == j:
-                                    if keyC == 'inside' or keyC == 'above':
-                                        temprule_diff[j][keyC] = len(valueC) - len(valueN)
-                                    else:
-                                        temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
-                                            valueN)
-                        j += 1
-            i += 1
-
-        temprule_add_count = -1
-        temprule_remove_count = -1
-        if i > j:
-            temprule_remove_count = i - j
-            for itr in range(j, i):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'remove'
-
-        if i < j:
-            temprule_add_count = j - i
-            for itr in range(i, j):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'add'
-
-        match = True
-        for index in range(min(len(rule_diff), len(temprule_diff))):
-            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
-                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
-                break
-            if cmp(rule_diff[index], temprule_diff[index]) != 0:
-                match = False
-                break
-
-        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
-            temp_index = map_vertically_advanced()
-            if temp_index == solution_index and solution_index != -1:
-                print "Solved by both horizontal and vertical symmetry" + "\n"
-                return solution_index
-            else:
-                if solution_index != -1:
-                    print "Solved by horizontal symmetry" + "\n"
-                    return solution_index
-                elif temp_index != -1:
-                    print "Solved by vertical symmetry" + "\n"
-                    return temp_index
-
-    return -1
-
-
-def solve_by_reflection():
+def solve_by_reflection(problem):
     try:
         value_array = []
         transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
@@ -474,7 +194,7 @@ def solve_by_reflection():
 
     return -1
 
-        # TODO: normal scaling
+    # TODO: normal scaling
 
 
 def solve_by_pixel_diff(problem):
@@ -506,33 +226,31 @@ def solve_by_pixel_diff(problem):
 
 def solve_by_offset(problem, flag):
     try:
-        # convert to grayscale and invert
-        figureA_bw = image_a.convert(mode='L')
-        figureA_inv = ImageChops.invert(figureA_bw)
-        dimA = figureA_inv.getbbox()
+        dim_a = get_bounding_box(image_a)
+        dim_c = get_bounding_box(image_c)
 
-        figureC_bw = image_c.convert(mode='L')
-        figureC_inv = ImageChops.invert(figureC_bw)
-        dimC = figureC_inv.getbbox()
-
-        left_image = ImageChops.offset(image_a, dimC[0] - dimA[0], dimC[1] - dimA[1])
-        right_image = ImageChops.offset(image_a, dimC[2] - dimA[2], dimC[3] - dimA[3])
+        left_image = ImageChops.offset(image_a, dim_c[0] - dim_a[0], dim_c[1] - dim_a[1])
+        right_image = ImageChops.offset(image_a, dim_c[2] - dim_a[2], dim_c[3] - dim_a[3])
         if flag == 0:
             left_intersect_a = get_union(left_image, image_a)
             final_intersect = get_union(left_intersect_a, right_image)
         elif flag == 1:
             final_intersect = get_union(left_image, right_image)
+        else:
+            return -1
 
         diff = find_difference(final_intersect, image_c)
 
         if diff <= 3:
-            left_image_g = ImageChops.offset(image_g, dimC[0] - dimA[0], dimC[1] - dimA[1])
-            right_image_g = ImageChops.offset(image_g, dimC[2] - dimA[2], dimC[3] - dimA[3])
+            left_image_g = ImageChops.offset(image_g, dim_c[0] - dim_a[0], dim_c[1] - dim_a[1])
+            right_image_g = ImageChops.offset(image_g, dim_c[2] - dim_a[2], dim_c[3] - dim_a[3])
             if flag == 0:
                 left_intersect_g = get_union(left_image_g, image_g)
                 final_transform = get_union(left_intersect_g, right_image_g)
             elif flag == 1:
                 final_transform = get_union(left_image_g, right_image_g)
+            else:
+                return -1
 
             diff_score_array = []
             for i in range(1, 9):
@@ -554,26 +272,17 @@ def solve_by_offset(problem, flag):
 
 def solve_by_special_scaling(problem):
     try:
-        # convert to grayscale and invert
-        figureA_bw = image_a.convert(mode='L')
-        figureA_inv = ImageChops.invert(figureA_bw)
-        dimA = figureA_inv.getbbox()
-
-        figureB_bw = image_b.convert(mode='L')
-        figureB_inv = ImageChops.invert(figureB_bw)
-        dimB = figureB_inv.getbbox()
-
-        figureC_bw = image_c.convert(mode='L')
-        figureC_inv = ImageChops.invert(figureC_bw)
-        dimC = figureC_inv.getbbox()
+        dim_a = get_bounding_box(image_a)
+        dim_b = get_bounding_box(image_b)
+        dim_c = get_bounding_box(image_c)
 
         # calculate lengths of a,b & c
-        length_a = dimA[2] - dimA[0]
-        width_a = dimA[3] - dimA[1]
-        length_b = dimB[2] - dimB[0]
-        width_b = dimB[3] - dimB[1]
-        length_c = dimC[2] - dimC[0]
-        width_c = dimC[3] - dimC[1]
+        length_a = dim_a[2] - dim_a[0]
+        width_a = dim_a[3] - dim_a[1]
+        length_b = dim_b[2] - dim_b[0]
+        width_b = dim_b[3] - dim_b[1]
+        length_c = dim_c[2] - dim_c[0]
+        width_c = dim_c[3] - dim_c[1]
 
         # find scale tuple
         scalex_ba = length_b / float(length_a)
@@ -651,24 +360,24 @@ def solve_by_rolling(problem):
     try:
         width, length = image_a.size[0], image_a.size[1]
 
-        left_half = image_a.crop((0, 0, width/2, length))
-        right_half = image_a.crop((width/2, 0, width, length))
+        left_half = image_a.crop((0, 0, width / 2, length))
+        right_half = image_a.crop((width / 2, 0, width, length))
 
         final_image = image_a.copy()
-        final_image.paste(right_half, (5, 0, width/2+5, length))
-        final_image.paste(left_half, (width/2-5, 0, width-5, length))
+        final_image.paste(right_half, (5, 0, width / 2 + 5, length))
+        final_image.paste(left_half, (width / 2 - 5, 0, width - 5, length))
 
         diff = find_difference(final_image, image_c)
 
         if diff <= 2:
             width, length = image_g.size[0], image_g.size[1]
 
-            left_half = image_g.crop((0, 0, width/2, length))
-            right_half = image_g.crop((width/2, 0, width, length))
+            left_half = image_g.crop((0, 0, width / 2, length))
+            right_half = image_g.crop((width / 2, 0, width, length))
 
             final_transform = image_g.copy()
-            final_transform.paste(right_half, (0, 0, width/2, length))
-            final_transform.paste(left_half, (width/2, 0, width, length))
+            final_transform.paste(right_half, (0, 0, width / 2, length))
+            final_transform.paste(left_half, (width / 2, 0, width, length))
 
             diff_score_array = []
             for i in range(1, 9):
@@ -698,15 +407,15 @@ def solve_by_misc(problem):
         diff1 = c_pixel - f_pixel
         diff2 = g_pixel - h_pixel
 
-        mean_diff = (diff1 + diff2)/2
-        mean_pixel = (f_pixel + h_pixel)/2
+        mean_diff = (diff1 + diff2) / 2
+        mean_pixel = (f_pixel + h_pixel) / 2
 
         pixel_array = []
 
         for i in range(1, 9):
             option_image = Image.open(problem.figures[str(i)].visualFilename)
             pixel_count = get_pixel_count(option_image)
-            pixel_array.append(abs(mean_pixel-pixel_count-mean_diff))
+            pixel_array.append(abs(mean_pixel - pixel_count - mean_diff))
 
         if min(pixel_array) < 200:
             return pixel_array.index(min(pixel_array)) + 1
@@ -715,6 +424,14 @@ def solve_by_misc(problem):
 
     except BaseException:
         pass
+
+
+def get_bounding_box(image):
+    # convert to grayscale and invert
+    image_bw = image.convert(mode='L')
+    image_inv = ImageChops.invert(image_bw)
+
+    return image_inv.getbbox()
 
 
 def get_pixel_count(image):
@@ -734,27 +451,27 @@ def get_pixel_count(image):
         return -1
 
 
-def get_intersection(image_a, image_b):
-    return ImageChops.lighter(image_a, image_b)
+def get_intersection(first_image, second_image):
+    return ImageChops.lighter(first_image, second_image)
 
 
-def get_union(image_a, image_b):
-    return ImageChops.darker(image_a, image_b)
+def get_union(first_image, second_image):
+    return ImageChops.darker(first_image, second_image)
 
 
-def find_difference(first_figure, second_figure):
+def find_difference(first_image, second_image):
     # Reference: http://rosettacode.org/wiki/Percentage_difference_between_images#Python
 
-    pairs = izip(first_figure.getdata(), second_figure.getdata())
-    if len(first_figure.getbands()) == 1:
+    pairs = izip(first_image.getdata(), second_image.getdata())
+    if len(first_image.getbands()) == 1:
         # for gray-scale jpegs
         dif = sum(abs(p1 - p2) for p1, p2 in pairs)
     else:
         dif = sum(abs(c1 - c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
 
-    ncomponents = first_figure.size[0] * first_figure.size[1] * 3
+    n_components = first_image.size[0] * first_image.size[1] * 3
 
-    return (dif / 255.0 * 100) / ncomponents
+    return (dif / 255.0 * 100) / n_components
 
 
 def map_vertically_basic():
@@ -1081,7 +798,7 @@ class Agent:
                 figure = prob[key]
                 file_name = figure.visualFilename
                 load_image(key, file_name)
-            i = solve_by_reflection()
+            i = solve_by_reflection(problem)
             if i == -1:
                 i = solve_by_pixel_diff(problem)
                 if i == -1:
