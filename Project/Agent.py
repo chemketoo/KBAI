@@ -164,27 +164,24 @@ def store_attributes(key_value, dict_objects):
 
 def solve_by_reflection(problem):
     try:
-        value_array = []
         transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
 
         if problem.problemType == '2x2':
             diff = find_difference(transpose_a, image_b)
-        elif problem.problemType == '3x3':
-            diff = find_difference(transpose_a, image_c)
         else:
-            return -1
+            diff = find_difference(transpose_a, image_c)
 
         if diff < 2:
+            value_array = []
             if problem.problemType == '2x2':
                 transpose_c = image_c.transpose(Image.FLIP_LEFT_RIGHT)
-                transpose_c.show()
                 for i in range(1, 7):
                     option_image = Image.open(problem.figures[str(i)].visualFilename)
                     option_diff = math.fabs(find_difference(transpose_c, option_image) - diff)
                     value_array.append(option_diff)
 
                 return value_array.index(min(value_array)) + 1
-            elif problem.problemType == '3x3':
+            else:
                 transpose_g = image_g.transpose(Image.FLIP_LEFT_RIGHT)
                 for i in range(1, 9):
                     option_image = Image.open(problem.figures[str(i)].visualFilename)
@@ -192,8 +189,6 @@ def solve_by_reflection(problem):
                     value_array.append(option_diff)
 
                 return value_array.index(min(value_array)) + 1
-            else:
-                return -1
         else:
             return -1
 
@@ -207,24 +202,87 @@ def solve_by_reflection(problem):
 
 def solve_by_pixel_diff(problem):
     try:
-        diff_ac = ImageChops.invert(ImageChops.difference(image_a, image_c))
-        a_union_c = get_union(diff_ac, image_a)
-        diff = find_difference(a_union_c, image_c)
+        if problem.problemType == '2x2':
+            image_diff = ImageChops.invert(ImageChops.difference(image_a, image_b))
+            union = get_union(image_diff, image_a)
+            diff = find_difference(union, image_b)
+        else:
+            image_diff = ImageChops.invert(ImageChops.difference(image_a, image_c))
+            union = get_union(image_diff, image_a)
+            diff = find_difference(union, image_c)
 
         if diff <= 1:
-            if find_difference(diff_ac, image_g) < 1:
-                return -1
-
-            final_transform = get_union(diff_ac, image_g)
             diff_score_array = []
-            for i in range(1, 9):
-                result_option = Image.open(problem.figures[str(i)].visualFilename)
-                diff_score = find_difference(final_transform, result_option)
-                diff_score_array.append(diff_score)
+            if problem.problemType == '2x2':
+                if find_difference(image_diff, image_c) < 1:
+                    return -1
+
+                final_transform = get_union(image_diff, image_c)
+                for i in range(1, 7):
+                    result_option = Image.open(problem.figures[str(i)].visualFilename)
+                    diff_score = find_difference(final_transform, result_option)
+                    diff_score_array.append(diff_score)
+            else:
+                if find_difference(image_diff, image_g) < 1:
+                    return -1
+
+                final_transform = get_union(image_diff, image_g)
+                for i in range(1, 9):
+                    result_option = Image.open(problem.figures[str(i)].visualFilename)
+                    diff_score = find_difference(final_transform, result_option)
+                    diff_score_array.append(diff_score)
+
             if min(diff_score_array) < 1.5:
                 return diff_score_array.index(min(diff_score_array)) + 1
             else:
                 return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_decrease(problem, flag):
+    try:
+        if flag == 0:
+            image_diff = ImageChops.invert(ImageChops.difference(image_a, image_b))
+        else:
+            image_diff = ImageChops.invert(ImageChops.difference(image_a, image_c))
+
+        diff_a = ImageChops.invert(ImageChops.difference(image_a, image_diff))
+
+        if flag == 0:
+            diff = find_difference(diff_a, image_b)
+        else:
+            diff = find_difference(diff_a, image_c)
+
+        if diff <= 1:
+            diff_score_array = []
+
+            if flag == 0:
+                if find_difference(image_diff, image_c) < 1:
+                    return -1
+                final_transform = ImageChops.invert(ImageChops.difference(image_c, image_diff))
+            else:
+                if find_difference(image_diff, image_b) < 1:
+                    return -1
+                final_transform = ImageChops.invert(ImageChops.difference(image_b, image_diff))
+
+            for i in range(1, 7):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(final_transform, result_option)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            if flag == 1:
+                return -1
+            else:
+                solve_by_decrease(problem, 1)
 
     except BaseException:
         pass
@@ -812,8 +870,10 @@ class Agent:
                 #             if i == -1:
                 #                 i = solve_by_misc(problem)
                 if i == -1:
-                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                    return i
+                    i = solve_by_decrease(problem, 0)
+                    if i == -1:
+                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                        return i
             return i
             # i = find_solution_basic()
             # if i == -1:
