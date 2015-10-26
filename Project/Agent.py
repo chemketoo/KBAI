@@ -159,33 +159,41 @@ def store_attributes(key_value, dict_objects):
 
         # Check A & C and apply to B and solution set
 
+# Code for Solving 3x3 problems using visual approach
+
 
 def solve_by_reflection(problem):
     try:
         value_array = []
         transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
-        diff = find_difference(transpose_a, image_c)
 
-        if diff < 1:
-            transpose_g = image_g.transpose(Image.FLIP_LEFT_RIGHT)
-            diff_1 = math.fabs(find_difference(transpose_g, image_1) - diff)
-            value_array.append(diff_1)
-            diff_2 = math.fabs(find_difference(transpose_g, image_2) - diff)
-            value_array.append(diff_2)
-            diff_3 = math.fabs(find_difference(transpose_g, image_3) - diff)
-            value_array.append(diff_3)
-            diff_4 = math.fabs(find_difference(transpose_g, image_4) - diff)
-            value_array.append(diff_4)
-            diff_5 = math.fabs(find_difference(transpose_g, image_5) - diff)
-            value_array.append(diff_5)
-            diff_6 = math.fabs(find_difference(transpose_g, image_6) - diff)
-            value_array.append(diff_6)
-            diff_7 = math.fabs(find_difference(transpose_g, image_7) - diff)
-            value_array.append(diff_7)
-            diff_8 = math.fabs(find_difference(transpose_g, image_8) - diff)
-            value_array.append(diff_8)
+        if problem.problemType == '2x2':
+            diff = find_difference(transpose_a, image_b)
+        elif problem.problemType == '3x3':
+            diff = find_difference(transpose_a, image_c)
+        else:
+            return -1
 
-            return value_array.index(min(value_array)) + 1
+        if diff < 2:
+            if problem.problemType == '2x2':
+                transpose_c = image_c.transpose(Image.FLIP_LEFT_RIGHT)
+                transpose_c.show()
+                for i in range(1, 7):
+                    option_image = Image.open(problem.figures[str(i)].visualFilename)
+                    option_diff = math.fabs(find_difference(transpose_c, option_image) - diff)
+                    value_array.append(option_diff)
+
+                return value_array.index(min(value_array)) + 1
+            elif problem.problemType == '3x3':
+                transpose_g = image_g.transpose(Image.FLIP_LEFT_RIGHT)
+                for i in range(1, 9):
+                    option_image = Image.open(problem.figures[str(i)].visualFilename)
+                    option_diff = math.fabs(find_difference(transpose_g, option_image) - diff)
+                    value_array.append(option_diff)
+
+                return value_array.index(min(value_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
@@ -278,18 +286,18 @@ def solve_by_special_scaling(problem):
 
         # calculate lengths of a,b & c
         length_a = dim_a[2] - dim_a[0]
-        width_a = dim_a[3] - dim_a[1]
+        # width_a = dim_a[3] - dim_a[1]
         length_b = dim_b[2] - dim_b[0]
-        width_b = dim_b[3] - dim_b[1]
+        # width_b = dim_b[3] - dim_b[1]
         length_c = dim_c[2] - dim_c[0]
-        width_c = dim_c[3] - dim_c[1]
+        # width_c = dim_c[3] - dim_c[1]
 
         # find scale tuple
         scalex_ba = length_b / float(length_a)
-        scaley_ba = width_b / float(width_a)
+        # scale_y_ba = width_b / float(width_a)
 
         scalex_cb = length_c / float(length_b)
-        scaley_cb = width_c / float(width_c)
+        # scale_y_cb = width_c / float(width_c)
 
         scale_tuple = int(scalex_cb * scalex_ba * image_a.size[0]), int(
             scalex_cb * scalex_ba * image_a.size[1])
@@ -352,7 +360,6 @@ def solve_by_special_scaling(problem):
 
     return -1
 
-
     # TODO: normal scaling
 
 
@@ -392,6 +399,8 @@ def solve_by_rolling(problem):
         pass
 
     return -1
+
+# Utilities Methods
 
 
 def solve_by_misc(problem):
@@ -472,6 +481,8 @@ def find_difference(first_image, second_image):
     n_components = first_image.size[0] * first_image.size[1] * 3
 
     return (dif / 255.0 * 100) / n_components
+
+# Code for Solving 2x2 problems using verbal approach
 
 
 def map_vertically_basic():
@@ -787,10 +798,27 @@ class Agent:
                 figure = prob[key]
                 object_list = figure.objects
                 parse_problem(key, object_list)
-            i = find_solution_basic()
+                file_name = figure.visualFilename
+                load_image(key, file_name)
+            i = solve_by_reflection(problem)
             if i == -1:
-                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                i = solve_by_pixel_diff(problem)
+                # if i == -1:
+                #     i = solve_by_offset(problem, 0)
+                #     if i == -1:
+                #         i = solve_by_special_scaling(problem)
+                #         if i == -1:
+                #             i = solve_by_rolling(problem)
+                #             if i == -1:
+                #                 i = solve_by_misc(problem)
+                if i == -1:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                    return i
             return i
+            # i = find_solution_basic()
+            # if i == -1:
+            #     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+            # return i
         elif problem.problemType == '3x3':
             # TODO:write code for vertical symmetry
             prob = problem.figures
