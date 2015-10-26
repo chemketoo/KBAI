@@ -162,6 +162,74 @@ def store_attributes(key_value, dict_objects):
 # Code for Solving 3x3 problems using visual approach
 
 
+def solve_by_horizontal_reflection(problem, flag):
+    try:
+        if flag == 0:
+            transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
+        else:
+            transpose_a = image_a.transpose(Image.FLIP_TOP_BOTTOM)
+
+        diff = find_difference(transpose_a, image_b)
+
+        if diff < 2:
+            value_array = []
+            if problem.problemType == '2x2':
+                if flag == 0:
+                    transpose_c = image_c.transpose(Image.FLIP_LEFT_RIGHT)
+                else:
+                    transpose_c = image_c.transpose(Image.FLIP_TOP_BOTTOM)
+                for i in range(1, 7):
+                    option_image = Image.open(problem.figures[str(i)].visualFilename)
+                    option_diff = math.fabs(find_difference(transpose_c, option_image) - diff)
+                    value_array.append(option_diff)
+
+                return value_array.index(min(value_array)) + 1
+        else:
+            if flag == 1:
+                return -1
+            else:
+                return solve_by_horizontal_reflection(problem, 1)
+
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_vertical_reflection(problem, flag):
+    try:
+        if flag == 0:
+            transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
+        else:
+            transpose_a = image_a.transpose(Image.FLIP_TOP_BOTTOM)
+
+        diff = find_difference(transpose_a, image_c)
+
+        if diff < 2:
+            value_array = []
+            if flag == 0:
+                transpose_b = image_b.transpose(Image.FLIP_LEFT_RIGHT)
+            else:
+                transpose_b = image_b.transpose(Image.FLIP_TOP_BOTTOM)
+
+            for i in range(1, 7):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                option_diff = math.fabs(find_difference(transpose_b, option_image) - diff)
+                value_array.append(option_diff)
+
+            return value_array.index(min(value_array)) + 1
+        else:
+            if flag == 1:
+                return -1
+            else:
+                return solve_by_vertical_reflection(problem, 1)
+
+    except BaseException:
+        pass
+
+    return -1
+
+
 def solve_by_reflection(problem):
     try:
         transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
@@ -282,7 +350,7 @@ def solve_by_decrease(problem, flag):
             if flag == 1:
                 return -1
             else:
-                solve_by_decrease(problem, 1)
+                return solve_by_decrease(problem, 1)
 
     except BaseException:
         pass
@@ -858,22 +926,16 @@ class Agent:
                 parse_problem(key, object_list)
                 file_name = figure.visualFilename
                 load_image(key, file_name)
-            i = solve_by_reflection(problem)
+            i = solve_by_horizontal_reflection(problem, 0)
             if i == -1:
-                i = solve_by_pixel_diff(problem)
-                # if i == -1:
-                #     i = solve_by_offset(problem, 0)
-                #     if i == -1:
-                #         i = solve_by_special_scaling(problem)
-                #         if i == -1:
-                #             i = solve_by_rolling(problem)
-                #             if i == -1:
-                #                 i = solve_by_misc(problem)
+                i = solve_by_vertical_reflection(problem, 0)
                 if i == -1:
-                    i = solve_by_decrease(problem, 0)
+                    i = solve_by_pixel_diff(problem)
                     if i == -1:
-                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                        return i
+                        i = solve_by_decrease(problem, 0)
+                        if i == -1:
+                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                            return i
             return i
             # i = find_solution_basic()
             # if i == -1:
