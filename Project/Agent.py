@@ -159,7 +159,7 @@ def store_attributes(key_value, dict_objects):
 
         # Check A & C and apply to B and solution set
 
-# Code for Solving 3x3 problems using visual approach
+# Code for problems using visual approach
 
 
 def solve_by_horizontal_rotation(problem):
@@ -268,6 +268,30 @@ def solve_by_vertical_reflection(problem, flag):
         pass
 
     return -1
+
+
+def solve_by_and(problem):
+    dim_a = get_bounding_box(image_a)
+    side_length = dim_a[2] - dim_a[0]
+    shape_length = side_length/2
+    area = (shape_length**2) * 1.5 * math.sqrt(3)
+    pixel_a = get_pixel_count(image_b)
+    diff = abs(pixel_a - area)
+
+    value_array = []
+    for i in range(1, 7):
+        option_image = Image.open(problem.figures[str(i)].visualFilename)
+        dim = get_bounding_box(option_image)
+        side_length = dim[2] - dim[0]
+        option_area = side_length**2
+        pixel_count = get_pixel_count(option_image)
+        option_diff = abs(pixel_count - option_area)
+        value_array.append(option_diff)
+
+    if min(value_array) < 500:
+        return value_array.index(min(value_array)) + 1
+    else:
+        return -1
 
 
 def solve_by_reflection(problem):
@@ -566,8 +590,6 @@ def solve_by_rolling(problem):
 
     return -1
 
-# Utilities Methods
-
 
 def solve_by_misc(problem):
     try:
@@ -599,6 +621,8 @@ def solve_by_misc(problem):
 
     except BaseException:
         pass
+
+# Utilities Methods
 
 
 def get_bounding_box(image):
@@ -648,7 +672,7 @@ def find_difference(first_image, second_image):
 
     return (dif / 255.0 * 100) / n_components
 
-# Code for Solving 2x2 problems using verbal approach
+# Code for Solving only 2x2 problems using verbal approach
 
 
 def map_vertically_basic():
@@ -957,7 +981,7 @@ class Agent:
     # Returning your answer as a string may cause your program to crash.
     def Solve(self, problem):
         init_objects()
-        print "Attempting to solve " + problem.name
+        print "Attempting to solve " + problem.name + " using visual approach"
         if problem.problemType == '2x2':
             prob = problem.figures
             for key, value in sorted(prob.iteritems()):
@@ -978,8 +1002,11 @@ class Agent:
                             if i == -1:
                                 i = solve_by_decrease(problem, 0)
                                 if i == -1:
-                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                    return i
+                                    i = solve_by_and(problem)
+                                    if i == -1:
+                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                        return i
+            print 'Problem Solved' + "\n"
             return i
             # i = find_solution_basic()
             # if i == -1:
@@ -1006,6 +1033,7 @@ class Agent:
                                 if i == -1:
                                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
                                     return i
+            print 'Problem Solved' + "\n"
             return i
         else:
             print "My creator has not equipped me to handle such problems yet. I would skip this problem." + "\n"
