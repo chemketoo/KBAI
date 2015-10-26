@@ -219,7 +219,10 @@ def solve_by_horizontal_reflection(problem, flag):
                     option_diff = math.fabs(find_difference(transpose_c, option_image) - diff)
                     value_array.append(option_diff)
 
-                return value_array.index(min(value_array)) + 1
+                if min(value_array) < 10:
+                    return value_array.index(min(value_array)) + 1
+                else:
+                    return -1
         else:
             if flag == 1:
                 return -1
@@ -251,7 +254,7 @@ def solve_by_vertical_reflection(problem, flag):
                 option_diff = math.fabs(find_difference(transpose_b, option_image) - diff)
                 value_array.append(option_diff)
 
-            if min(value_array) < 5:
+            if min(value_array) < 10:
                 return value_array.index(min(value_array)) + 1
             else:
                 return -1
