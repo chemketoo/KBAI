@@ -162,6 +162,45 @@ def store_attributes(key_value, dict_objects):
 # Code for Solving 3x3 problems using visual approach
 
 
+def solve_by_horizontal_rotation(problem):
+    angles = [45, 90, 135, 180, 225, 270, 315]
+    for i in range(0,len(angles),1):
+        rotate_a = image_a.rotate(angles[i])
+        diff = find_difference(rotate_a, image_b)
+
+        if diff < 1:
+            value_array = []
+            rotate_c = image_c.rotate(angles[i])
+            for i in range(1, 7):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                option_diff = math.fabs(find_difference(rotate_c, option_image) - diff)
+                value_array.append(option_diff)
+
+            if min(value_array) < 5:
+                return value_array.index(min(value_array)) + 1
+
+    return -1
+
+
+def solve_by_vertical_rotation(problem):
+    angles = [45, 90, 135, 180, 225, 270, 315]
+    for i in range(0, len(angles), 1):
+        rotate_a = image_a.rotate(angles[i])
+        diff = find_difference(rotate_a, image_c)
+        if diff < 3:
+            value_array = []
+            rotate_b = image_b.rotate(angles[i])
+            for j in range(1, 7):
+                option_image = Image.open(problem.figures[str(j)].visualFilename)
+                option_diff = math.fabs(find_difference(rotate_b, option_image) - diff)
+                value_array.append(option_diff)
+            if min(value_array) < 5:
+                return value_array.index(min(value_array)) + 1
+
+
+    return -1
+
+
 def solve_by_horizontal_reflection(problem, flag):
     try:
         if flag == 0:
@@ -202,7 +241,6 @@ def solve_by_vertical_reflection(problem, flag):
             transpose_a = image_a.transpose(Image.FLIP_LEFT_RIGHT)
         else:
             transpose_a = image_a.transpose(Image.FLIP_TOP_BOTTOM)
-
         diff = find_difference(transpose_a, image_c)
 
         if diff < 2:
@@ -211,13 +249,15 @@ def solve_by_vertical_reflection(problem, flag):
                 transpose_b = image_b.transpose(Image.FLIP_LEFT_RIGHT)
             else:
                 transpose_b = image_b.transpose(Image.FLIP_TOP_BOTTOM)
-
             for i in range(1, 7):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
                 option_diff = math.fabs(find_difference(transpose_b, option_image) - diff)
                 value_array.append(option_diff)
 
-            return value_array.index(min(value_array)) + 1
+            if min(value_array) < 5:
+                return value_array.index(min(value_array)) + 1
+            else:
+                return -1
         else:
             if flag == 1:
                 return -1
@@ -926,16 +966,20 @@ class Agent:
                 parse_problem(key, object_list)
                 file_name = figure.visualFilename
                 load_image(key, file_name)
-            i = solve_by_horizontal_reflection(problem, 0)
+            i = solve_by_horizontal_rotation(problem)
             if i == -1:
-                i = solve_by_vertical_reflection(problem, 0)
+                i = solve_by_vertical_rotation(problem)
                 if i == -1:
-                    i = solve_by_pixel_diff(problem)
+                    i = solve_by_horizontal_reflection(problem, 0)
                     if i == -1:
-                        i = solve_by_decrease(problem, 0)
+                        i = solve_by_vertical_reflection(problem, 0)
                         if i == -1:
-                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                            return i
+                            i = solve_by_pixel_diff(problem)
+                            if i == -1:
+                                i = solve_by_decrease(problem, 0)
+                                if i == -1:
+                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                    return i
             return i
             # i = find_solution_basic()
             # if i == -1:
