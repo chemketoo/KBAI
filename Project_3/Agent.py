@@ -159,6 +159,7 @@ def store_attributes(key_value, dict_objects):
 
         # Check A & C and apply to B and solution set
 
+
 # Code for problems using visual approach
 
 
@@ -273,8 +274,8 @@ def solve_by_vertical_reflection(problem, flag):
 def solve_by_and(problem):
     dim_a = get_bounding_box(image_a)
     side_length = dim_a[2] - dim_a[0]
-    shape_length = side_length/2
-    area = (shape_length**2) * 1.5 * math.sqrt(3)
+    shape_length = side_length / 2
+    area = (shape_length ** 2) * 1.5 * math.sqrt(3)
     pixel_a = get_pixel_count(image_b)
     diff = abs(pixel_a - area)
 
@@ -283,7 +284,7 @@ def solve_by_and(problem):
         option_image = Image.open(problem.figures[str(i)].visualFilename)
         dim = get_bounding_box(option_image)
         side_length = dim[2] - dim[0]
-        option_area = side_length**2
+        option_area = side_length ** 2
         pixel_count = get_pixel_count(option_image)
         option_diff = abs(pixel_count - option_area)
         value_array.append(option_diff)
@@ -513,8 +514,6 @@ def solve_by_general_scaling(problem):
 
         scalex_cb = length_c / float(length_b)
         # scale_y_cb = width_c / float(width_c)
-        print (length_f/float(length_d))
-        print (length_c/float(length_a))
         scale_tuple = int(scalex_cb * scalex_ba * image_a.size[0]), int(
             scalex_cb * scalex_ba * image_a.size[1])
 
@@ -543,9 +542,10 @@ def solve_by_general_scaling(problem):
         diff = find_difference(final_transform, image_c)
 
         # now apply the transformation to solution set and check
-        result_scale = int(1.45 * image_a.size[0]), int(1.45 * image_a.size[1])
+        scale_factor = length_c / float(length_a)
+        result_scale = int(scale_factor * image_a.size[0]), int(scale_factor * image_a.size[1])
         # 94 percent similarity
-        if diff < 6:
+        if diff < 5:
             g_intersect_a = ImageChops.difference(image_g, image_a)
             g_intersect_a = ImageChops.invert(g_intersect_a)
             ga_intersect_g = get_intersection(g_intersect_a, image_g)
@@ -598,32 +598,12 @@ def solve_by_special_scaling(problem):
         # width_c = dim_c[3] - dim_c[1]
         # print length_b/float(length_a), length_c/float(length_b)
 
-        # calculate lengths of d,e & f
-        length_d = dim_d[2] - dim_d[0]
-        # width_d = dim_d[3] - dim_d[1]
-        length_e = dim_e[2] - dim_e[0]
-        # width_e = dim_e[3] - dim_e[1]
-        length_f = dim_f[2] - dim_f[0]
-        # width_f = dim_f[3] - dim_f[1]
-        # print length_e/float(length_d), length_f/float(length_e)
-
-        # calculate lengths of g,h & i
-        length_g = dim_g[2] - dim_g[0]
-        # width_g = dim_g[3] - dim_g[1]
-        length_h = dim_h[2] - dim_h[0]
-        # width_h = dim_h[3] - dim_h[1]
-        length_answer = dim_answer[2] - dim_answer[0]
-        # width_answer = dim_answer[3] - dim_answer[1]
-        # print length_h/float(length_g), length_answer/float(length_h)
-
         # find scale tuple
         scalex_ba = length_b / float(length_a)
         # scale_y_ba = width_b / float(width_a)
 
         scalex_cb = length_c / float(length_b)
         # scale_y_cb = width_c / float(width_c)
-        print (length_f/float(length_d))
-        print (length_c/float(length_a))
         scale_tuple = int(scalex_cb * scalex_ba * image_a.size[0]), int(
             scalex_cb * scalex_ba * image_a.size[1])
 
@@ -685,8 +665,6 @@ def solve_by_special_scaling(problem):
 
     return -1
 
-    # TODO: normal scaling
-
 
 def solve_by_rolling(problem):
     try:
@@ -726,6 +704,108 @@ def solve_by_rolling(problem):
     return -1
 
 
+def solve_by_rolling_transform(problem):
+    try:
+        diff_list = []
+        match_list = []
+        diff_list.append(find_difference(image_a, image_g))
+        diff_list.append(find_difference(image_b, image_g))
+        diff_list.append(find_difference(image_c, image_g))
+
+        for index in range(len(diff_list)):
+            if diff_list[index] < 1:
+                match_list.append(index)
+
+        del diff_list[:]
+
+        diff_list.append(find_difference(image_a, image_h))
+        diff_list.append(find_difference(image_b, image_h))
+        diff_list.append(find_difference(image_c, image_h))
+
+        for index in range(len(diff_list)):
+            if diff_list[index] < 1:
+                match_list.append(index)
+
+        if match_list[0] == 0 and match_list[1] == 1:
+            sol_img = image_c
+        elif match_list[0] == 0 and match_list[1] == 2:
+            sol_img = image_b
+        else:
+            sol_img = image_a
+
+        if diff_list[match_list[1]] < 1:
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_img, result_option)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_special_rolltrans(problem):
+    try:
+        intersect = get_intersection(image_a, image_c)
+        a_new = ImageChops.invert(ImageChops.difference(image_a, intersect))
+        b_new = ImageChops.invert(ImageChops.difference(image_b, intersect))
+        c_new = ImageChops.invert(ImageChops.difference(image_c, intersect))
+
+        sol_intersect = get_intersection(image_g, image_h)
+        g_new = ImageChops.invert(ImageChops.difference(image_g, sol_intersect))
+        h_new = ImageChops.invert(ImageChops.difference(image_h, sol_intersect))
+
+        diff_list = []
+        match_list = []
+        diff_list.append(find_difference(a_new, g_new))
+        diff_list.append(find_difference(image_b, g_new))
+        diff_list.append(find_difference(image_c, g_new))
+
+        for index in range(len(diff_list)):
+            if diff_list[index] < 3:
+                match_list.append(index)
+
+        del diff_list[:]
+
+        diff_list.append(find_difference(a_new, h_new))
+        diff_list.append(find_difference(b_new, h_new))
+        diff_list.append(find_difference(c_new, h_new))
+
+        for index in range(len(diff_list)):
+            if diff_list[index] < 3:
+                match_list.append(index)
+
+        if match_list[0] == 0 and match_list[1] == 1:
+            sol_img = c_new
+        elif match_list[0] == 0 and match_list[1] == 2:
+            sol_img = b_new
+        else:
+            sol_img = a_new
+
+        sol_img.show()
+        if diff_list[match_list[1]] < 3:
+            diff_score_array = []
+            for i in range(1, 9):
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                sol_new = ImageChops.invert(ImageChops.difference(result_option, sol_intersect))
+                diff_score = find_difference(sol_img, sol_new)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+    except BaseException:
+        pass
+
+    return -1
+
+
 def solve_by_misc(problem):
     try:
         c_pixel = get_pixel_count(image_c)
@@ -756,6 +836,7 @@ def solve_by_misc(problem):
 
     except BaseException:
         pass
+
 
 # Utilities Methods
 
@@ -807,279 +888,8 @@ def find_difference(first_image, second_image):
 
     return (dif / 255.0 * 100) / n_components
 
+
 # Code for Solving only 2x2 problems using verbal approach
-
-
-def map_vertically_basic():
-    rule_diff = []
-    temprule_diff = []
-    ref_rules = {'shape': [],  #
-                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
-                 'fill': ['no', 'yes'],
-                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
-                 'inside': [],
-                 'above': [],
-                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': [],
-                 'transform': ['add', 'remove']
-                 }
-
-    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
-
-    rule_length = max(len(objectlist_A), len(objectlist_C))
-
-    for i in range(rule_length):
-        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                          'overlaps': '', 'transform': ''})
-
-    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
-    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-    i = 0
-    for dict_A in objectlist_A:
-        for keyA, valueA in iter(sorted(dict_A.items())):
-            if keyA != 'name':
-                j = 0
-                for dict_C in objectlist_C:
-                    for keyC, valueC in iter(sorted(dict_C.items())):
-                        if keyC != 'name':
-                            if valueA not in ref_rules[keyA]:
-                                if keyA != 'inside' and keyA != 'above':
-                                    ref_rules[keyA].append(valueA)
-                            if valueC not in ref_rules[keyC]:
-                                if keyC != 'inside' and keyC != 'above':
-                                    ref_rules[keyC].append(valueC)
-                            if keyA == keyC and i == j:
-                                if keyA == 'inside' or keyA == 'above':
-                                    rule_diff[j][keyA] = len(valueA) - len(valueC)
-                                else:
-                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[keyC].index(valueC)
-                    j += 1
-        i += 1
-
-    rule_add_count = -1
-    rule_remove_count = -1
-    if i > j:
-        rule_remove_count = i - j
-        for itr in range(j, i):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'remove'
-
-    if i < j:
-        rule_add_count = j - i
-        for itr in range(i, j):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'add'
-
-    solution_index = 0
-
-    for number_list in solution_list:
-        solution_index += 1
-        del temprule_diff[:]
-        temprule_length = max(len(objectlist_B), len(number_list))
-        for i in range(temprule_length):
-            temprule_diff.append(
-                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': '', 'transform': ''})
-
-        # number_list.sort(lambda x, y: cmp(len(x), len(y)))
-        # objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-        i = 0
-        for dict_B in objectlist_B:
-            for keyB, valueB in iter(sorted(dict_B.items())):
-                if keyB != 'name':
-                    j = 0
-                    for dict_N in number_list:
-                        for keyN, valueN in iter(sorted(dict_N.items())):
-                            if keyN != 'name':
-                                if valueB not in ref_rules[keyB]:
-                                    if keyB != 'inside' and keyB != 'above':
-                                        ref_rules[keyB].append(valueB)
-                                if valueN not in ref_rules[keyN]:
-                                    if keyN != 'inside' and keyN != 'above':
-                                        ref_rules[keyN].append(valueN)
-                                if keyB == keyN and i == j:
-                                    if keyB == 'inside' or keyB == 'above':
-                                        temprule_diff[j][keyB] = len(valueB) - len(valueN)
-                                    else:
-                                        temprule_diff[j][keyB] = ref_rules[keyB].index(valueB) - ref_rules[keyN].index(
-                                            valueN)
-                        j += 1
-            i += 1
-
-        temprule_add_count = -1
-        temprule_remove_count = -1
-        if i > j:
-            temprule_remove_count = i - j
-            for itr in range(j, i):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'remove'
-
-        if i < j:
-            temprule_add_count = j - i
-            for itr in range(i, j):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'add'
-
-        match = True
-        for index in range(min(len(rule_diff), len(temprule_diff))):
-            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
-                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
-                break
-            if cmp(rule_diff[index], temprule_diff[index]) != 0:
-                match = False
-                break
-        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
-            return solution_index
-
-    return -1
-
-
-def find_solution_basic():
-    rule_diff = []
-    temprule_diff = []
-    ref_rules = {'shape': [],  #
-                 'size': ['very small', 'small', 'medium', 'large', 'very large', 'huge'],  # order matters
-                 'fill': ['no', 'yes'],
-                 'angle': [0, 45, 90, 135, 180, 225, 270, 315],  # order matters
-                 'inside': [],
-                 'above': [],
-                 'alignment': ['bottom-left', 'bottom-right', 'top-left', 'top-right'],
-                 'overlaps': [],
-                 'transform': ['add', 'remove']
-                 }
-
-    solution_list = [objectlist_1, objectlist_2, objectlist_3, objectlist_4, objectlist_5, objectlist_6]
-
-    rule_length = max(len(objectlist_A), len(objectlist_B))
-
-    for i in range(rule_length):
-        rule_diff.append({'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                          'overlaps': '', 'transform': ''})
-
-    objectlist_A.sort(lambda x, y: cmp(len(x), len(y)))
-    objectlist_B.sort(lambda x, y: cmp(len(x), len(y)))
-
-    i = 0
-    for dict_A in objectlist_A:
-        for keyA, valueA in iter(sorted(dict_A.items())):
-            if keyA != 'name':
-                j = 0
-                for dict_B in objectlist_B:
-                    for keyB, valueB in iter(sorted(dict_B.items())):
-                        if keyB != 'name':
-                            if valueA not in ref_rules[keyA]:
-                                if keyA != 'inside' and keyA != 'above':
-                                    ref_rules[keyA].append(valueA)
-                            if valueB not in ref_rules[keyB]:
-                                if keyB != 'inside' and keyB != 'above':
-                                    ref_rules[keyB].append(valueB)
-                            if keyA == keyB and i == j:
-                                if keyA == 'inside' or keyA == 'above':
-                                    rule_diff[j][keyA] = len(valueA) - len(valueB)
-                                else:
-                                    rule_diff[j][keyA] = ref_rules[keyA].index(valueA) - ref_rules[
-                                        keyB].index(valueB)
-                    j += 1
-        i += 1
-
-    rule_add_count = -1
-    rule_remove_count = -1
-    if i > j:
-        rule_remove_count = i - j
-        for itr in range(j, i):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'remove'
-
-    if i < j:
-        rule_add_count = j - i
-        for itr in range(i, j):
-            for keyR, valueR in iter(sorted(rule_diff[itr].items())):
-                if keyR == 'transform':
-                    rule_diff[itr][keyR] = 'add'
-
-    solution_index = 0
-
-    for number_list in solution_list:
-        solution_index += 1
-        del temprule_diff[:]
-        temprule_length = max(len(objectlist_C), len(number_list))
-        for i in range(temprule_length):
-            temprule_diff.append(
-                {'shape': 0, 'size': 0, 'fill': 0, 'angle': 0, 'inside': '', 'above': '', 'alignment': 0,
-                 'overlaps': '', 'transform': ''})
-
-        number_list.sort(lambda x, y: cmp(len(x), len(y)))
-        objectlist_C.sort(lambda x, y: cmp(len(x), len(y)))
-
-        i = 0
-        for dict_C in objectlist_C:
-            for keyC, valueC in iter(sorted(dict_C.items())):
-                if keyC != 'name':
-                    j = 0
-                    for dict_N in number_list:
-                        for keyN, valueN in iter(sorted(dict_N.items())):
-                            if keyN != 'name':
-                                if valueC not in ref_rules[keyC]:
-                                    if keyC != 'inside' and keyC != 'above':
-                                        ref_rules[keyC].append(valueC)
-                                if valueN not in ref_rules[keyN]:
-                                    if keyN != 'inside' and keyN != 'above':
-                                        ref_rules[keyN].append(valueN)
-                                if keyC == keyN and i == j:
-                                    if keyC == 'inside' or keyC == 'above':
-                                        temprule_diff[j][keyC] = len(valueC) - len(valueN)
-                                    else:
-                                        temprule_diff[j][keyC] = ref_rules[keyC].index(valueC) - ref_rules[keyN].index(
-                                            valueN)
-                        j += 1
-            i += 1
-
-        temprule_add_count = -1
-        temprule_remove_count = -1
-        if i > j:
-            temprule_remove_count = i - j
-            for itr in range(j, i):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'remove'
-
-        if i < j:
-            temprule_add_count = j - i
-            for itr in range(i, j):
-                for keyR, valueR in iter(sorted(temprule_diff[itr].items())):
-                    if keyR == 'transform':
-                        temprule_diff[itr][keyR] = 'add'
-
-        match = True
-        for index in range(min(len(rule_diff), len(temprule_diff))):
-            if rule_diff[index]['transform'] == 'add' or rule_diff[index]['transform'] == 'remove' \
-                    or temprule_diff[index]['transform'] == 'add' or temprule_diff[index]['transform'] == 'remove':
-                break
-            if cmp(rule_diff[index], temprule_diff[index]) != 0:
-                match = False
-                break
-
-        if match and rule_add_count == temprule_add_count and rule_remove_count == temprule_remove_count:
-            temp_index = map_vertically_basic()
-            if temp_index == solution_index and solution_index != -1:
-                print "Solved by both horizontal and vertical symmetry" + "\n"
-                return solution_index
-            else:
-                if solution_index != -1:
-                    print "Solved by horizontal symmetry" + "\n"
-                    return solution_index
-                elif temp_index != -1:
-                    print "Solved by vertical symmetry" + "\n"
-                    return temp_index
-
-    return -1
 
 
 class Agent:
@@ -1116,6 +926,7 @@ class Agent:
     # Returning your answer as a string may cause your program to crash.
     def Solve(self, problem):
         init_objects()
+        print problem.name
         print "Attempting to solve " + problem.name + " using visual approach"
         if problem.problemType == '2x2':
             prob = problem.figures
@@ -1143,10 +954,6 @@ class Agent:
                                         return i
             print 'Problem Solved' + "\n"
             return i
-            # i = find_solution_basic()
-            # if i == -1:
-            #     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-            # return i
         elif problem.problemType == '3x3':
             # TODO:write code for vertical symmetry
             prob = problem.figures
@@ -1154,22 +961,44 @@ class Agent:
                 figure = prob[key]
                 file_name = figure.visualFilename
                 load_image(key, file_name)
-            i = solve_by_reflection(problem)
-            if i == -1:
-                i = solve_by_pixel_diff(problem)
+            if 'C-' in problem.name:
+                i = solve_by_reflection(problem)
                 if i == -1:
-                    i = solve_by_offset(problem, 0)
+                    i = solve_by_pixel_diff(problem)
                     if i == -1:
-                        i = solve_by_general_scaling(problem)
+                        i = solve_by_offset(problem, 0)
                         if i == -1:
-                            i = solve_by_special_scaling(problem)
+                            i = solve_by_general_scaling(problem)
                             if i == -1:
-                                i = solve_by_rolling(problem)
+                                i = solve_by_special_scaling(problem)
                                 if i == -1:
-                                    i = solve_by_misc(problem)
+                                    i = solve_by_rolling(problem)
                                     if i == -1:
-                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                        return i
+                                        i = solve_by_misc(problem)
+                                        if i == -1:
+                                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                            return i
+            else:
+                i = solve_by_reflection(problem)
+                if i == -1:
+                    i = solve_by_pixel_diff(problem)
+                    if i == -1:
+                        i = solve_by_offset(problem, 0)
+                        if i == -1:
+                            i = solve_by_general_scaling(problem)
+                            if i == -1:
+                                i = solve_by_special_scaling(problem)
+                                if i == -1:
+                                    i = solve_by_rolling(problem)
+                                    if i == -1:
+                                        i = solve_by_rolling_transform(problem)
+                                        if i == -1:
+                                            i = solve_by_special_rolltrans(problem)
+                                            if i == -1:
+                                                i = solve_by_misc(problem)
+                                                if i == -1:
+                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                    return i
             print 'Problem Solved' + "\n"
             return i
         else:
