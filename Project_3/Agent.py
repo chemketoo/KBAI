@@ -946,16 +946,17 @@ def solve_by_shift_diff(problem):
         width_a = dim_a[2] - dim_a[0]
         offset_b = ImageChops.offset(image_b, -width_a/3, 0)
         image_diff_1 = ImageChops.invert(ImageChops.difference(image_a, offset_b))
-        row_a_offset = ImageChops.offset(image_diff_1, -width_a/6, 0)
+        row_a_offset = ImageChops.offset(image_diff_1, int(-width_a/6), 0)
         diff = find_difference(row_a_offset, image_c)
 
         dim_g = get_bounding_box(image_g)
         width_g = dim_g[2] - dim_g[0]
         offset_h = ImageChops.offset(image_h, -width_g/3, 0)
         image_diff_2 = ImageChops.invert(ImageChops.difference(image_g, offset_h))
-        row_c_offset = ImageChops.offset(image_diff_2, -width_a/6, 0)
+        row_c_offset = ImageChops.offset(image_diff_2, int(-width_g/6), 0)
 
         diff_score_array = []
+
         if diff < 1:
             for i in range(1, 9):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
@@ -1006,6 +1007,7 @@ def solve_by_intersection(problem):
         g_union_h = get_intersection(image_g, image_h)
 
         diff_score_array = []
+
         if diff < 1:
             for i in range(1, 9):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
@@ -1015,7 +1017,54 @@ def solve_by_intersection(problem):
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             return -1
-        return -1
+
+    except BaseException:
+        pass
+
+
+def solve_by_reverse_diff(problem):
+    try:
+        dim_a = get_bounding_box(image_a)
+        width_a = dim_a[2] - dim_a[0]
+        dim_b = get_bounding_box(image_b)
+        width_b = dim_b[2] - dim_b[0]
+        # print width_a, width_b
+        transpose_b = image_b.transpose(Image.FLIP_TOP_BOTTOM)
+        offset_b = ImageChops.offset(transpose_b, int(-width_a/3), 0)
+        image_diff_1 = ImageChops.invert(ImageChops.difference(image_a, offset_b))
+        c_new = ImageChops.offset(image_diff_1, int(-width_a/6), 0)
+        diff_1 = find_difference(image_c, c_new)
+
+        dim_d = get_bounding_box(image_d)
+        width_d = dim_a[2] - dim_d[0]
+        dim_e = get_bounding_box(image_e)
+        width_e = dim_e[2] - dim_e[0]
+        # print width_d, width_e
+        transpose_e = image_e.transpose(Image.FLIP_TOP_BOTTOM)
+        offset_e = ImageChops.offset(transpose_e, int(-width_d/6), 0)
+        image_diff_2 = ImageChops.invert(ImageChops.difference(image_d, offset_e))
+        f_new = ImageChops.offset(image_diff_2, int(-width_d/3), 0)
+        diff_2 = find_difference(image_f, f_new)
+
+        dim_g = get_bounding_box(image_g)
+        width_g = dim_g[2] - dim_g[0]
+        dim_h = get_bounding_box(image_h)
+        width_h = dim_h[2] - dim_h[0]
+        # print width_g, width_h
+        transpose_h = image_h.transpose(Image.FLIP_TOP_BOTTOM)
+        offset_h = ImageChops.offset(transpose_h, int(-width_h/2), 0)
+        image_diff_3 = ImageChops.invert(ImageChops.difference(image_g, offset_h))
+        sol_new = ImageChops.offset(image_diff_3, int(-width_h/2), 0)
+
+        diff_score_array = []
+        if diff_1 < 1 or diff_2 < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
 
     except BaseException:
         pass
@@ -1201,8 +1250,10 @@ class Agent:
                                         if i == -1:
                                             i = solve_by_intersection(problem)
                                             if i == -1:
-                                                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                return i
+                                                i = solve_by_reverse_diff(problem)
+                                                if i == -1:
+                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                    return i
             print 'Problem Solved' + "\n"
             return i
         else:
