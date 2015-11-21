@@ -974,18 +974,19 @@ def solve_by_shift_diff(problem):
 
 
 def solve_by_simple_diff(problem):
+    # TODO: fix 7 and 8 for Set E
     try:
         image_diff_1 = ImageChops.invert(ImageChops.difference(image_a, image_b))
         diff = find_difference(image_diff_1, image_c)
         image_diff_2 = ImageChops.invert(ImageChops.difference(image_g, image_h))
-        image_diff_2.show()
+
         diff_score_array = []
         if diff < 2:
             for i in range(1, 9):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(image_diff_2, option_image)
                 diff_score_array.append(diff_score)
-            print diff_score_array
+
             if min(diff_score_array) < 5:
                 return diff_score_array.index(min(diff_score_array)) + 1
             else:
@@ -995,6 +996,30 @@ def solve_by_simple_diff(problem):
 
     except BaseException:
         pass
+
+
+def solve_by_intersection(problem):
+    try:
+        a_union_b = get_intersection(image_a, image_b)
+        diff = find_difference(a_union_b, image_c)
+
+        g_union_h = get_intersection(image_g, image_h)
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(g_union_h, option_image)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+        return -1
+
+    except BaseException:
+        pass
+
 
 # Utilities Methods
 
@@ -1174,8 +1199,10 @@ class Agent:
                                     if i == -1:
                                         i = solve_by_simple_diff(problem)
                                         if i == -1:
-                                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                            return i
+                                            i = solve_by_intersection(problem)
+                                            if i == -1:
+                                                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                return i
             print 'Problem Solved' + "\n"
             return i
         else:
