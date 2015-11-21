@@ -939,6 +939,40 @@ def solve_by_union(problem):
     except BaseException:
         pass
 
+
+def solve_by_shift_diff(problem):
+    try:
+        dim_a = get_bounding_box(image_a)
+        width_a = dim_a[2] - dim_a[0]
+        offset_b = ImageChops.offset(image_b, -width_a/3, 0)
+        image_diff_1 = ImageChops.invert(ImageChops.difference(image_a, offset_b))
+        row_a_offset = ImageChops.offset(image_diff_1, -width_a/6, 0)
+        diff = find_difference(row_a_offset, image_c)
+
+        dim_g = get_bounding_box(image_g)
+        width_g = dim_g[2] - dim_g[0]
+        offset_h = ImageChops.offset(image_h, -width_g/3, 0)
+        image_diff_2 = ImageChops.invert(ImageChops.difference(image_g, offset_h))
+        row_c_offset = ImageChops.offset(image_diff_2, -width_a/6, 0)
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(row_c_offset, option_image)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+
 # Utilities Methods
 
 
@@ -1113,8 +1147,10 @@ class Agent:
                             if i == -1:
                                 i = solve_by_union(problem)
                                 if i == -1:
-                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                    return i
+                                    i = solve_by_shift_diff(problem)
+                                    if i == -1:
+                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                        return i
             print 'Problem Solved' + "\n"
             return i
         else:
