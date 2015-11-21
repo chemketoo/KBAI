@@ -917,6 +917,28 @@ def solve_by_misc(problem):
         pass
 
 
+def solve_by_union(problem):
+    try:
+        a_union_b = get_union(image_a, image_b)
+        diff = find_difference(a_union_b, image_c)
+
+        g_union_h = get_union(image_g, image_h)
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(g_union_h, option_image)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+        return -1
+
+    except BaseException:
+        pass
+
 # Utilities Methods
 
 
@@ -1057,7 +1079,7 @@ class Agent:
                                         if i == -1:
                                             print "Hmmm, this looks tricky. I would skip this problem." + "\n"
                                             return i
-            else:
+            elif 'D-' in problem.name:
                 i = solve_by_reflection(problem)
                 if i == -1:
                     i = solve_by_pixel_diff(problem)
@@ -1080,6 +1102,19 @@ class Agent:
                                                     if i == -1:
                                                         print "Hmmm, this looks tricky. I would skip this problem." + "\n"
                                                         return i
+            else:
+                i = solve_by_reflection(problem)
+                if i == -1:
+                    i = solve_by_pixel_diff(problem)
+                    if i == -1:
+                        i = solve_by_offset(problem, 0)
+                        if i == -1:
+                            i = solve_by_rolling(problem)
+                            if i == -1:
+                                i = solve_by_union(problem)
+                                if i == -1:
+                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                    return i
             print 'Problem Solved' + "\n"
             return i
         else:

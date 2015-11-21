@@ -42,8 +42,8 @@ def main():
         i = 0
         for problem in set.problems:  # Your agent will solve one problem at a time.
             # try:
-            # i += 1
-            # if i == 6:
+            i += 1
+            if i == 1 or i == 2 or i == 3:
                 problem.setAnswerReceived(agent.Solve(
                     problem))  # The problem will be passed to your agent as a RavensProblem object as a parameter to the Solve method
                 # Your agent should return its answer at the conclusion of the execution of Solve.
