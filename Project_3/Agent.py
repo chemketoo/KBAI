@@ -456,6 +456,7 @@ def solve_by_offset(problem, flag):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(final_transform, result_option)
                 diff_score_array.append(diff_score)
+
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             if flag == 1:
@@ -544,8 +545,8 @@ def solve_by_general_scaling(problem):
         # now apply the transformation to solution set and check
         scale_factor = length_c / float(length_a)
         result_scale = int(scale_factor * image_a.size[0]), int(scale_factor * image_a.size[1])
-        # 94 percent similarity
-        if diff < 5:
+        # 97 percent similarity
+        if diff < 3:
             g_intersect_a = ImageChops.difference(image_g, image_a)
             g_intersect_a = ImageChops.invert(g_intersect_a)
             ga_intersect_g = get_intersection(g_intersect_a, image_g)
@@ -657,7 +658,6 @@ def solve_by_special_scaling(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(result_final_transform, result_option)
                 diff_score_array.append(diff_score)
-
             return diff_score_array.index(min(diff_score_array)) + 1
 
     except BaseException:
@@ -694,7 +694,6 @@ def solve_by_rolling(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(final_transform, result_option)
                 diff_score_array.append(diff_score)
-
             return diff_score_array.index(min(diff_score_array)) + 1
 
         return -1
@@ -739,7 +738,6 @@ def solve_by_rolling_transform(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(sol_img, result_option)
                 diff_score_array.append(diff_score)
-
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             return -1
@@ -795,7 +793,6 @@ def solve_by_special_rolltrans(problem):
                 sol_new = ImageChops.invert(ImageChops.difference(result_option, sol_intersect))
                 diff_score = find_difference(sol_img, sol_new)
                 diff_score_array.append(diff_score)
-
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             return -1
@@ -819,6 +816,69 @@ def solve_by_special_diff(problem):
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             return -1
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_inner_extract(problem):
+    try:
+        a_union_b = get_union(image_a, image_b)
+        row_a = get_union(a_union_b, image_c)
+
+        d_union_e = get_union(image_d, image_e)
+        row_b = get_union(d_union_e, image_f)
+
+        diff = ImageChops.invert(ImageChops.difference(row_a, row_b))
+
+        g_union_h = get_union(image_g, image_h)
+        diff_score_array = []
+        for i in range(1, 9):
+            if i == 1:
+                result_option = Image.open(problem.figures[str(i)].visualFilename)
+                row_c = get_union(g_union_h, result_option)
+                sol_diff = ImageChops.invert(ImageChops.difference(row_b, row_c))
+                temp_img = get_union(diff, sol_diff)
+                a_new = ImageChops.invert(ImageChops.difference(image_a, temp_img))
+                b_new = ImageChops.invert(ImageChops.difference(image_b, temp_img))
+                c_new = ImageChops.invert(ImageChops.difference(image_c, temp_img))
+
+                diff_list = []
+                match_list = []
+                diff_list.append(find_difference(a_new, image_g))
+                diff_list.append(find_difference(b_new, image_g))
+                diff_list.append(find_difference(c_new, image_g))
+
+                for index in range(len(diff_list)):
+                    if diff_list[index] < 2.5:
+                        match_list.append(index)
+
+                del diff_list[:]
+
+                diff_list.append(find_difference(a_new, image_h))
+                diff_list.append(find_difference(b_new, image_h))
+                diff_list.append(find_difference(c_new, image_h))
+
+                for index in range(len(diff_list)):
+                    if diff_list[index] < 2.5:
+                        match_list.append(index)
+
+                if match_list[0] == 0 and match_list[1] == 1:
+                    sol_img = c_new
+                elif match_list[0] == 0 and match_list[1] == 2:
+                    sol_img = b_new
+                else:
+                    sol_img = a_new
+
+                if diff_list[match_list[1]] < 2.5:
+                    diff_score = find_difference(sol_img, result_option)
+                    diff_score_array.append(diff_score)
+                    return diff_score_array.index(min(diff_score_array)) + 1
+                else:
+                    return -1
+
+        return -1
     except BaseException:
         pass
 
@@ -1006,11 +1066,11 @@ class Agent:
                         if i == -1:
                             i = solve_by_general_scaling(problem)
                             if i == -1:
-                                i = solve_by_special_scaling(problem)
+                                i = solve_by_rolling(problem)
                                 if i == -1:
-                                    i = solve_by_rolling(problem)
+                                    i = solve_by_rolling_transform(problem)
                                     if i == -1:
-                                        i = solve_by_rolling_transform(problem)
+                                        i = solve_by_inner_extract(problem)
                                         if i == -1:
                                             i = solve_by_special_rolltrans(problem)
                                             if i == -1:
