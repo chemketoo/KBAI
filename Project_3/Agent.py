@@ -788,7 +788,6 @@ def solve_by_special_rolltrans(problem):
         else:
             sol_img = a_new
 
-        sol_img.show()
         if diff_list[match_list[1]] < 3:
             diff_score_array = []
             for i in range(1, 9):
@@ -797,6 +796,26 @@ def solve_by_special_rolltrans(problem):
                 diff_score = find_difference(sol_img, sol_new)
                 diff_score_array.append(diff_score)
 
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_special_diff(problem):
+    try:
+        a_diff_c = ImageChops.invert(ImageChops.difference(image_a, image_c))
+        diff_score_array = []
+        for i in range(1, 9):
+            result_option = Image.open(problem.figures[str(i)].visualFilename)
+            g_diff_sol = ImageChops.invert(ImageChops.difference(image_g, result_option))
+            diff_score = find_difference(a_diff_c, g_diff_sol)
+            diff_score_array.append(diff_score)
+
+        if min(diff_score_array) < 3.0:
             return diff_score_array.index(min(diff_score_array)) + 1
         else:
             return -1
@@ -995,10 +1014,12 @@ class Agent:
                                         if i == -1:
                                             i = solve_by_special_rolltrans(problem)
                                             if i == -1:
-                                                i = solve_by_misc(problem)
+                                                i = solve_by_special_diff(problem)
                                                 if i == -1:
-                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                    return i
+                                                    i = solve_by_misc(problem)
+                                                    if i == -1:
+                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                        return i
             print 'Problem Solved' + "\n"
             return i
         else:
