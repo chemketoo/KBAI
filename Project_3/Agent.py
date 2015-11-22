@@ -10,7 +10,7 @@
 
 # Install Pillow and uncomment this line to access image processing.
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageMath
 from itertools import izip
 import math
 
@@ -916,6 +916,8 @@ def solve_by_misc(problem):
     except BaseException:
         pass
 
+    return -1
+
 
 def solve_by_union(problem):
     try:
@@ -938,6 +940,8 @@ def solve_by_union(problem):
 
     except BaseException:
         pass
+
+    return -1
 
 
 def solve_by_shift_diff(problem):
@@ -973,6 +977,8 @@ def solve_by_shift_diff(problem):
     except BaseException:
         pass
 
+    return -1
+
 
 def solve_by_simple_diff(problem):
     # TODO: fix 7 and 8 for Set E
@@ -998,6 +1004,8 @@ def solve_by_simple_diff(problem):
     except BaseException:
         pass
 
+    return -1
+
 
 def solve_by_intersection(problem):
     try:
@@ -1020,6 +1028,8 @@ def solve_by_intersection(problem):
 
     except BaseException:
         pass
+
+    return -1
 
 
 def solve_by_reverse_diff(problem):
@@ -1069,6 +1079,8 @@ def solve_by_reverse_diff(problem):
     except BaseException:
         pass
 
+    return -1
+
 
 def solve_by_crop_union(problem):
     try:
@@ -1078,11 +1090,11 @@ def solve_by_crop_union(problem):
         width_b = image_b.size[0]
         height_b = image_b.size[1]
 
-        cropbox_a = 0, 0, width_a, height_a/2
-        cropbox_b = 0, height_b/2, width_b, height_b
+        crop_box_a = 0, 0, width_a, height_a/2
+        crop_box_b = 0, height_b/2, width_b, height_b
 
-        cropped_a = image_a.crop(cropbox_a)
-        cropped_b = image_b.crop(cropbox_b)
+        cropped_a = image_a.crop(crop_box_a)
+        cropped_b = image_b.crop(crop_box_b)
 
         c_new = image_a.copy()
         c_new.paste(cropped_a, (0, 0, width_a, height_a/2))
@@ -1096,11 +1108,11 @@ def solve_by_crop_union(problem):
         width_h = image_h.size[0]
         height_h = image_h.size[1]
 
-        cropbox_g = 0, 0, width_g, height_g/2
-        cropbox_h = 0, height_h/2, width_h, height_h
+        crop_box_g = 0, 0, width_g, height_g/2
+        crop_box_h = 0, height_h/2, width_h, height_h
 
-        cropped_g = image_g.crop(cropbox_g)
-        cropped_h = image_h.crop(cropbox_h)
+        cropped_g = image_g.crop(crop_box_g)
+        cropped_h = image_h.crop(crop_box_h)
 
         sol_new = image_g.copy()
         sol_new.paste(cropped_g, (0, 0, width_g, height_g/2))
@@ -1119,6 +1131,76 @@ def solve_by_crop_union(problem):
 
     except BaseException:
         pass
+
+    return -1
+
+
+def solve_by_extract_roll(problem):
+    try:
+        rotated_square = get_intersection(image_b, image_f)
+        four_squares = get_image_difference(rotated_square, image_f)
+        rotated_lines = get_image_difference(rotated_square, image_b)
+        circle = get_intersection(image_c, image_d)
+        square = get_image_difference(four_squares, image_a)
+        straight_lines = get_image_difference(circle, image_c)
+
+        shape_array = [square, rotated_square, circle, four_squares, rotated_lines, straight_lines]
+
+        diff_array = []
+        index_array = []
+
+        for i in range(len(shape_array)):
+            for j in range(i+1, len(shape_array), 1):
+                temp_image = get_union(shape_array[i], shape_array[j])
+                diff = find_difference(temp_image, image_g)
+                diff_array.append(diff)
+                index_array.append((i, j))
+
+        index_a, index_b = index_array[diff_array.index(min(diff_array))]
+
+        shape_a = shape_array[index_a]
+        shape_b = shape_array[index_b]
+
+        shape_array.remove(shape_a)
+        shape_array.remove(shape_b)
+
+        del diff_array[:]
+        del index_array[:]
+
+        for i in range(len(shape_array)):
+            for j in range(i+1, len(shape_array), 1):
+                temp_image = get_union(shape_array[i], shape_array[j])
+                diff = find_difference(temp_image, image_g)
+                diff_array.append(diff)
+                index_array.append((i, j))
+
+        index_c, index_d = index_array[diff_array.index(min(diff_array))]
+
+        shape_c = shape_array[index_c]
+        shape_d = shape_array[index_d]
+
+        shape_array.remove(shape_c)
+        shape_array.remove(shape_d)
+
+        sol_new = get_union(shape_array[0], shape_array[1])
+
+        diff_score_array = []
+
+        for i in range(1, 9):
+            option_image = Image.open(problem.figures[str(i)].visualFilename)
+            diff_score = find_difference(sol_new, option_image)
+            diff_score_array.append(diff_score)
+
+        if min(diff_score_array) < 2.5:
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
 # Utilities Methods
 
 
@@ -1147,12 +1229,22 @@ def get_pixel_count(image):
         return -1
 
 
+def get_image_difference(first_image, second_image):
+    return ImageChops.invert(ImageChops.difference(first_image, second_image))
+
+
 def get_intersection(first_image, second_image):
     return ImageChops.lighter(first_image, second_image)
 
 
 def get_union(first_image, second_image):
     return ImageChops.darker(first_image, second_image)
+
+
+def get_xor(first_image, second_image):
+    first_expression = get_intersection(first_image, ImageChops.invert(second_image))
+    second_expression = get_intersection(ImageChops.invert(first_image), image_b)
+    return get_union(first_expression, second_expression)
 
 
 def find_difference(first_image, second_image):
@@ -1278,10 +1370,12 @@ class Agent:
                                             if i == -1:
                                                 i = solve_by_special_diff(problem)
                                                 if i == -1:
-                                                    i = solve_by_misc(problem)
+                                                    i = solve_by_extract_roll(problem)
                                                     if i == -1:
-                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                        return i
+                                                        i = solve_by_misc(problem)
+                                                        if i == -1:
+                                                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                            return i
             else:
                 i = solve_by_reflection(problem)
                 if i == -1:
