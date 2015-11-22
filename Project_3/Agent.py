@@ -1033,6 +1033,7 @@ def solve_by_intersection(problem):
 
 
 def solve_by_reverse_diff(problem):
+    # TODO: Generalize by adding center aligning code
     try:
         dim_a = get_bounding_box(image_a)
         width_a = dim_a[2] - dim_a[0]
