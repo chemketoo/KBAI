@@ -1285,6 +1285,53 @@ def solve_by_diagonal_approach(problem):
 
     return -1
 
+
+def solve_by_alternate_fill(problem):
+    try:
+        dim_c = get_bounding_box(image_c)
+        width_c = dim_c[2] - dim_c[0]
+
+        dim_g = get_bounding_box(image_g)
+        width_g = dim_g[2] - dim_g[0]
+
+        scale = width_c/float(width_g)
+
+        scale_tuple = int(scale * image_b.size[0]), int(scale * image_b.size[1])
+        resized_g = image_g.resize(scale_tuple)
+        resized_b = image_b.resize(scale_tuple)
+        scaled_width, scaled_height = resized_g.size
+
+        # find the crop box tuple
+        left_margin = (scaled_width - image_b.size[0]) / 2
+        right_margin = scaled_width - left_margin
+        upper_margin = (scaled_height - image_a.size[1]) / 2
+        lower_margin = scaled_height - upper_margin
+        crop_box = left_margin, upper_margin, right_margin, lower_margin
+
+        cropped_g = resized_g.crop(crop_box)
+        diff = find_difference(cropped_g, get_image_difference(image_c, image_e))
+
+        cropped_b = resized_b.crop(crop_box)
+        sol_image= get_image_difference(cropped_b, image_d)
+
+        diff_score_array = []
+        if diff < 4:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_image, option_image)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
 # Utilities Methods
 
 
@@ -1460,10 +1507,12 @@ class Agent:
                                                         if i == -1:
                                                             i = solve_by_diagonal_approach(problem)
                                                             if i == -1:
-                                                                i = solve_by_misc(problem)
+                                                                i = solve_by_alternate_fill(problem)
                                                                 if i == -1:
-                                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                                    return i
+                                                                    i = solve_by_misc(problem)
+                                                                    if i == -1:
+                                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                                        return i
             else:
                 i = solve_by_reflection(problem)
                 if i == -1:
