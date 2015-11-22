@@ -1070,6 +1070,55 @@ def solve_by_reverse_diff(problem):
         pass
 
 
+def solve_by_crop_union(problem):
+    try:
+        width_a = image_a.size[0]
+        height_a = image_a.size[1]
+
+        width_b = image_b.size[0]
+        height_b = image_b.size[1]
+
+        cropbox_a = 0, 0, width_a, height_a/2
+        cropbox_b = 0, height_b/2, width_b, height_b
+
+        cropped_a = image_a.crop(cropbox_a)
+        cropped_b = image_b.crop(cropbox_b)
+
+        c_new = image_a.copy()
+        c_new.paste(cropped_a, (0, 0, width_a, height_a/2))
+        c_new.paste(cropped_b, (0, height_b/2, width_b, height_b))
+
+        diff = find_difference(image_c, c_new)
+
+        width_g = image_g.size[0]
+        height_g = image_g.size[1]
+
+        width_h = image_h.size[0]
+        height_h = image_h.size[1]
+
+        cropbox_g = 0, 0, width_g, height_g/2
+        cropbox_h = 0, height_h/2, width_h, height_h
+
+        cropped_g = image_g.crop(cropbox_g)
+        cropped_h = image_h.crop(cropbox_h)
+
+        sol_new = image_g.copy()
+        sol_new.paste(cropped_g, (0, 0, width_g, height_g/2))
+        sol_new.paste(cropped_h, (0, height_h/2, width_h, height_h))
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+
+    except BaseException:
+        pass
 # Utilities Methods
 
 
@@ -1252,8 +1301,10 @@ class Agent:
                                             if i == -1:
                                                 i = solve_by_reverse_diff(problem)
                                                 if i == -1:
-                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                    return i
+                                                    i = solve_by_crop_union(problem)
+                                                    if i == -1:
+                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                        return i
             print 'Problem Solved' + "\n"
             return i
         else:
