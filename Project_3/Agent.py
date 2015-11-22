@@ -10,7 +10,7 @@
 
 # Install Pillow and uncomment this line to access image processing.
 
-from PIL import Image, ImageChops, ImageMath
+from PIL import Image, ImageChops
 from itertools import izip
 import math
 
@@ -1204,6 +1204,53 @@ def solve_by_extract_roll(problem):
 
     return -1
 
+
+def solve_by_special_approach(problem):
+    try:
+        a_pixel = get_pixel_count(image_a)
+        f_pixel = get_pixel_count(image_f)
+        h_pixel = get_pixel_count(image_h)
+        diff_1 = abs((f_pixel - a_pixel) - (h_pixel - f_pixel))
+
+        e_pixel = get_pixel_count(image_e)
+        g_pixel = get_pixel_count(image_g)
+        c_pixel = get_pixel_count(image_c)
+        diff_2 = abs((g_pixel - e_pixel) - (c_pixel - g_pixel))
+
+        b_pixel = get_pixel_count(image_b)
+        d_pixel = get_pixel_count(image_d)
+        min_count = min(b_pixel, d_pixel)
+        max_count = max(b_pixel, d_pixel)
+        pixel_diff = d_pixel - b_pixel
+
+        lower_count = min_count - pixel_diff
+        upper_count = max_count + pixel_diff
+
+        lower_array = []
+        upper_array = []
+
+        if diff_1 < 150 and diff_2 < 150:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                pixel_count = get_pixel_count(option_image)
+                lower_array.append(abs(pixel_count - lower_count))
+                upper_array.append(abs(pixel_count - upper_count))
+
+            if min(lower_array) <= min(upper_array):
+                if min(lower_array) < 100:
+                    return lower_array.index(min(lower_array)) + 1
+                else:
+                    return -1
+            else:
+                return upper_array.index(min(upper_array)) + 1
+
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
 # Utilities Methods
 
 
@@ -1375,10 +1422,12 @@ class Agent:
                                                 if i == -1:
                                                     i = solve_by_extract_roll(problem)
                                                     if i == -1:
-                                                        i = solve_by_misc(problem)
+                                                        i = solve_by_special_approach(problem)
                                                         if i == -1:
-                                                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                            return i
+                                                            i = solve_by_misc(problem)
+                                                            if i == -1:
+                                                                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                                return i
             else:
                 i = solve_by_reflection(problem)
                 if i == -1:
