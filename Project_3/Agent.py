@@ -1251,6 +1251,40 @@ def solve_by_special_approach(problem):
         pass
 
     return -1
+
+
+def solve_by_diagonal_approach(problem):
+    try:
+        plus = get_intersection(image_f, image_h)
+        circle = get_image_difference(plus, image_f)
+        four_dots = get_image_difference(image_a, plus)
+        square = get_image_difference(circle, image_b)
+        bigger_square = get_image_difference(square, image_d)
+        heart = get_image_difference(four_dots, image_e)
+
+        diff_1 = find_difference(get_union(plus, four_dots), image_a)
+        diff_2 = find_difference(get_union(heart, four_dots), image_e)
+        sol_image = get_union(square, four_dots)
+
+        diff_score_array = []
+        if diff_1 < 2 and diff_2 < 2:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_image, option_image)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
 # Utilities Methods
 
 
@@ -1424,10 +1458,12 @@ class Agent:
                                                     if i == -1:
                                                         i = solve_by_special_approach(problem)
                                                         if i == -1:
-                                                            i = solve_by_misc(problem)
+                                                            i = solve_by_diagonal_approach(problem)
                                                             if i == -1:
-                                                                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                                return i
+                                                                i = solve_by_misc(problem)
+                                                                if i == -1:
+                                                                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                                                                    return i
             else:
                 i = solve_by_reflection(problem)
                 if i == -1:
