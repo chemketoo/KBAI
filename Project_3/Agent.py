@@ -1156,11 +1156,11 @@ def solve_by_extract_roll(problem):
                 diff_array.append(diff)
                 index_array.append((i, j))
 
+        diff_1 = min(diff_array)
         index_a, index_b = index_array[diff_array.index(min(diff_array))]
 
         shape_a = shape_array[index_a]
         shape_b = shape_array[index_b]
-
         shape_array.remove(shape_a)
         shape_array.remove(shape_b)
 
@@ -1170,15 +1170,15 @@ def solve_by_extract_roll(problem):
         for i in range(len(shape_array)):
             for j in range(i+1, len(shape_array), 1):
                 temp_image = get_union(shape_array[i], shape_array[j])
-                diff = find_difference(temp_image, image_g)
+                diff = find_difference(temp_image, image_h)
                 diff_array.append(diff)
                 index_array.append((i, j))
 
+        diff_2 = min(diff_array)
         index_c, index_d = index_array[diff_array.index(min(diff_array))]
 
         shape_c = shape_array[index_c]
         shape_d = shape_array[index_d]
-
         shape_array.remove(shape_c)
         shape_array.remove(shape_d)
 
@@ -1186,13 +1186,16 @@ def solve_by_extract_roll(problem):
 
         diff_score_array = []
 
-        for i in range(1, 9):
-            option_image = Image.open(problem.figures[str(i)].visualFilename)
-            diff_score = find_difference(sol_new, option_image)
-            diff_score_array.append(diff_score)
+        if diff_1 < 6 and diff_2 < 6:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
 
-        if min(diff_score_array) < 2.5:
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 2.5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
