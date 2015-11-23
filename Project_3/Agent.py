@@ -1442,23 +1442,29 @@ class Agent:
                 file_name = figure.visualFilename
                 load_image(key, file_name)
             i = solve_by_horizontal_reflection(problem, 0)
-            if i == -1:
-                i = solve_by_vertical_reflection(problem, 0)
-                if i == -1:
-                    i = solve_by_horizontal_rotation(problem)
-                    if i == -1:
-                        i = solve_by_vertical_rotation(problem)
-                        if i == -1:
-                            i = solve_by_pixel_diff(problem)
-                            if i == -1:
-                                i = solve_by_decrease(problem, 0)
-                                if i == -1:
-                                    i = solve_by_and(problem)
-                                    if i == -1:
-                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                        return i
-            print 'Problem Solved' + "\n"
-            return i
+            if i != -1:
+                return i
+            i = solve_by_vertical_reflection(problem, 0)
+            if i != -1:
+                return i
+            i = solve_by_horizontal_rotation(problem)
+            if i != -1:
+                return i
+            i = solve_by_vertical_rotation(problem)
+            if i != -1:
+                return i
+            i = solve_by_pixel_diff(problem)
+            if i != -1:
+                return i
+            i = solve_by_decrease(problem, 0)
+            if i != -1:
+                return i
+            i = solve_by_and(problem)
+            if i != -1:
+                return i
+            else:
+                print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                return i
         elif problem.problemType == '3x3':
             # TODO:write code for vertical symmetry
             prob = problem.figures
@@ -1468,77 +1474,110 @@ class Agent:
                 load_image(key, file_name)
             if 'C-' in problem.name:
                 i = solve_by_reflection(problem)
-                if i == -1:
-                    i = solve_by_pixel_diff(problem)
-                    if i == -1:
-                        i = solve_by_offset(problem, 0)
-                        if i == -1:
-                            i = solve_by_general_scaling(problem)
-                            if i == -1:
-                                i = solve_by_special_scaling(problem)
-                                if i == -1:
-                                    i = solve_by_rolling(problem)
-                                    if i == -1:
-                                        i = solve_by_misc(problem)
-                                        if i == -1:
-                                            print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                            return i
+                if i != -1:
+                    return i
+                i = solve_by_pixel_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_offset(problem, 0)
+                if i != -1:
+                    return i
+                i = solve_by_general_scaling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_special_scaling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_rolling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_misc(problem)
+                if i != -1:
+                    return i
+                else:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                    return i
+
             elif 'D-' in problem.name:
                 i = solve_by_reflection(problem)
-                if i == -1:
-                    i = solve_by_pixel_diff(problem)
-                    if i == -1:
-                        i = solve_by_offset(problem, 0)
-                        if i == -1:
-                            i = solve_by_general_scaling(problem)
-                            if i == -1:
-                                i = solve_by_rolling(problem)
-                                if i == -1:
-                                    i = solve_by_rolling_transform(problem)
-                                    if i == -1:
-                                        i = solve_by_inner_extract(problem)
-                                        if i == -1:
-                                            i = solve_by_special_rolltrans(problem)
-                                            if i == -1:
-                                                i = solve_by_special_diff(problem)
-                                                if i == -1:
-                                                    i = solve_by_extract_roll(problem)
-                                                    if i == -1:
-                                                        i = solve_by_special_approach(problem)
-                                                        if i == -1:
-                                                            i = solve_by_diagonal_approach(problem)
-                                                            if i == -1:
-                                                                i = solve_by_alternate_fill(problem)
-                                                                if i == -1:
-                                                                    i = solve_by_misc(problem)
-                                                                    if i == -1:
-                                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                                        return i
+                if i != -1:
+                    return i
+                i = solve_by_pixel_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_offset(problem, 0)
+                if i != -1:
+                    return i
+                i = solve_by_general_scaling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_rolling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_rolling_transform(problem)
+                if i != -1:
+                    return i
+                i = solve_by_inner_extract(problem)
+                if i != -1:
+                    return i
+                i = solve_by_special_rolltrans(problem)
+                if i != -1:
+                    return i
+                i = solve_by_special_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_extract_roll(problem)
+                if i != -1:
+                    return i
+                i = solve_by_special_approach(problem)
+                if i != -1:
+                    return i
+                i = solve_by_diagonal_approach(problem)
+                if i != -1:
+                    return i
+                i = solve_by_alternate_fill(problem)
+                if i != -1:
+                    return i
+                i = solve_by_misc(problem)
+                if i != -1:
+                    return i
+                else:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                    return i
             else:
                 i = solve_by_reflection(problem)
-                if i == -1:
-                    i = solve_by_pixel_diff(problem)
-                    if i == -1:
-                        i = solve_by_offset(problem, 0)
-                        if i == -1:
-                            i = solve_by_rolling(problem)
-                            if i == -1:
-                                i = solve_by_union(problem)
-                                if i == -1:
-                                    i = solve_by_shift_diff(problem)
-                                    if i == -1:
-                                        i = solve_by_simple_diff(problem)
-                                        if i == -1:
-                                            i = solve_by_intersection(problem)
-                                            if i == -1:
-                                                i = solve_by_reverse_diff(problem)
-                                                if i == -1:
-                                                    i = solve_by_crop_union(problem)
-                                                    if i == -1:
-                                                        print "Hmmm, this looks tricky. I would skip this problem." + "\n"
-                                                        return i
-            print 'Problem Solved' + "\n"
-            return i
+                if i != -1:
+                    return i
+                i = solve_by_pixel_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_offset(problem, 0)
+                if i != -1:
+                    return i
+                i = solve_by_rolling(problem)
+                if i != -1:
+                    return i
+                i = solve_by_union(problem)
+                if i != -1:
+                    return i
+                i = solve_by_shift_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_simple_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_intersection(problem)
+                if i != -1:
+                    return i
+                i = solve_by_reverse_diff(problem)
+                if i != -1:
+                    return i
+                i = solve_by_crop_union(problem)
+                if i != -1:
+                    return i
+                else:
+                    print "Hmmm, this looks tricky. I would skip this problem." + "\n"
+                    return i
         else:
             print "My creator has not equipped me to handle such problems yet. I would skip this problem." + "\n"
             return -1
