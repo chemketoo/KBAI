@@ -1241,6 +1241,118 @@ def solve_by_crop_union_b(problem):
     return -1
 
 
+def solve_by_crop_union_c(problem):
+    try:
+        width_a = image_a.size[0]
+        height_a = image_a.size[1]
+
+        width_b = image_b.size[0]
+        height_b = image_b.size[1]
+
+        crop_box_a = 0, 0, width_a/2, height_a
+        crop_box_b = width_b/2, 0, width_b, height_b
+
+        cropped_a = image_a.crop(crop_box_a)
+        cropped_b = image_b.crop(crop_box_b)
+
+        c_new = image_a.copy()
+        c_new.paste(cropped_a, (0, 0, width_a/2, height_a))
+        c_new.paste(cropped_b, (width_b/2, 0, width_b, height_b))
+
+        diff = find_difference(image_c, c_new)
+
+        width_g = image_g.size[0]
+        height_g = image_g.size[1]
+
+        width_h = image_h.size[0]
+        height_h = image_h.size[1]
+
+        crop_box_g = 0, 0, width_g/2, height_g
+        crop_box_h = width_h/2, 0, width_h, height_h
+
+        cropped_g = image_g.crop(crop_box_g)
+        cropped_h = image_h.crop(crop_box_h)
+
+        sol_new = image_g.copy()
+        sol_new.paste(cropped_g, (0, 0, width_g/2, height_g))
+        sol_new.paste(cropped_h, (width_h/2, 0, width_h, height_h))
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_crop_union_d(problem):
+    try:
+        width_a = image_a.size[0]
+        height_a = image_a.size[1]
+
+        width_b = image_b.size[0]
+        height_b = image_b.size[1]
+
+        crop_box_a = width_a/2, 0, width_a, height_a
+        crop_box_b = 0, 0, width_b/2, height_b
+
+        cropped_a = image_a.crop(crop_box_a)
+        cropped_b = image_b.crop(crop_box_b)
+
+        c_new = image_a.copy()
+        c_new.paste(cropped_a, (width_a/2, 0, width_a, height_a))
+        c_new.paste(cropped_b, (0, 0, width_b/2, height_b))
+
+        diff = find_difference(image_c, c_new)
+
+        width_g = image_g.size[0]
+        height_g = image_g.size[1]
+
+        width_h = image_h.size[0]
+        height_h = image_h.size[1]
+
+        crop_box_g = width_g/2, 0, width_g, height_g
+        crop_box_h = 0, 0, width_h/2, height_h
+
+        cropped_g = image_g.crop(crop_box_g)
+        cropped_h = image_h.crop(crop_box_h)
+
+        sol_new = image_g.copy()
+        sol_new.paste(cropped_g, (width_g/2, 0, width_g, height_g))
+        sol_new.paste(cropped_h, (0, 0, width_h/2, height_h))
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
+
 def solve_by_extract_roll(problem):
     try:
         rotated_square = get_intersection(image_b, image_f)
@@ -1721,6 +1833,14 @@ class Agent:
                     print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_crop_union_b(problem)
+                if i != -1:
+                    print 'Problem Solved' + "\n"
+                    return i
+                i = solve_by_crop_union_c(problem)
+                if i != -1:
+                    print 'Problem Solved' + "\n"
+                    return i
+                i = solve_by_crop_union_d(problem)
                 if i != -1:
                     print 'Problem Solved' + "\n"
                     return i
