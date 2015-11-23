@@ -923,6 +923,12 @@ def solve_by_misc(problem):
 
 def solve_by_union(problem):
     try:
+        a_count = get_pixel_count(image_a)
+        b_count = get_pixel_count(image_b)
+        c_count = get_pixel_count(image_c)
+        count_mean = (a_count + b_count + c_count) / 3
+        # print c_count
+        # print count_mean
         a_union_b = get_union(image_a, image_b)
         # a_union_b.show()
         diff_1 = find_difference(a_union_b, image_c)
@@ -934,7 +940,7 @@ def solve_by_union(problem):
 
         diff_score_array = []
         # print diff_1, diff_2
-        if diff_1 < 5 and diff_2 < 7:
+        if diff_1 < 5 and diff_2 < 7 and count_mean > 1000 and c_count > 1300:
             for i in range(1, 9):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(g_union_h, option_image)
@@ -1656,6 +1662,7 @@ class Agent:
                     return i
                 i = solve_by_union(problem)
                 if i != -1:
+                    # print 'here'
                     print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_shift_diff(problem)
