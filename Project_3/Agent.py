@@ -1083,7 +1083,7 @@ def solve_by_reverse_diff(problem):
     return -1
 
 
-def solve_by_crop_union(problem):
+def solve_by_crop_union_a(problem):
     try:
         width_a = image_a.size[0]
         height_a = image_a.size[1]
@@ -1118,6 +1118,59 @@ def solve_by_crop_union(problem):
         sol_new = image_g.copy()
         sol_new.paste(cropped_g, (0, 0, width_g, height_g/2))
         sol_new.paste(cropped_h, (0, height_h/2, width_h, height_h))
+
+        diff_score_array = []
+        if diff < 1:
+            for i in range(1, 9):
+                option_image = Image.open(problem.figures[str(i)].visualFilename)
+                diff_score = find_difference(sol_new, option_image)
+                diff_score_array.append(diff_score)
+
+            return diff_score_array.index(min(diff_score_array)) + 1
+        else:
+            return -1
+
+    except BaseException:
+        pass
+
+    return -1
+
+
+def solve_by_crop_union_b(problem):
+    try:
+        width_a = image_a.size[0]
+        height_a = image_a.size[1]
+
+        width_b = image_b.size[0]
+        height_b = image_b.size[1]
+
+        crop_box_a = 0, height_a/2, width_a, height_a
+        crop_box_b = 0, 0, width_b, height_b/2
+
+        cropped_a = image_a.crop(crop_box_a)
+        cropped_b = image_b.crop(crop_box_b)
+
+        c_new = image_a.copy()
+        c_new.paste(cropped_a, (0, height_a/2, width_a, height_a))
+        c_new.paste(cropped_b, (0, 0, width_b, height_b/2))
+
+        diff = find_difference(image_c, c_new)
+
+        width_g = image_g.size[0]
+        height_g = image_g.size[1]
+
+        width_h = image_h.size[0]
+        height_h = image_h.size[1]
+
+        crop_box_g = 0, height_g/2, width_g, height_g
+        crop_box_h = 0, 0, width_h, height_h/2
+
+        cropped_g = image_g.crop(crop_box_g)
+        cropped_h = image_h.crop(crop_box_h)
+
+        sol_new = image_g.copy()
+        sol_new.paste(cropped_g, (0, height_g/2, width_g, height_g))
+        sol_new.paste(cropped_h, (0, 0, width_h, height_h/2))
 
         diff_score_array = []
         if diff < 1:
@@ -1443,24 +1496,31 @@ class Agent:
                 load_image(key, file_name)
             i = solve_by_horizontal_reflection(problem, 0)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_vertical_reflection(problem, 0)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_horizontal_rotation(problem)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_vertical_rotation(problem)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_pixel_diff(problem)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_decrease(problem, 0)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             i = solve_by_and(problem)
             if i != -1:
+                print 'Problem Solved' + "\n"
                 return i
             else:
                 print "Hmmm, this looks tricky. I would skip this problem." + "\n"
@@ -1475,24 +1535,31 @@ class Agent:
             if 'C-' in problem.name:
                 i = solve_by_reflection(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_pixel_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_offset(problem, 0)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_general_scaling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_special_scaling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_rolling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_misc(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 else:
                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
@@ -1501,45 +1568,58 @@ class Agent:
             elif 'D-' in problem.name:
                 i = solve_by_reflection(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_pixel_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_offset(problem, 0)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_general_scaling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_rolling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_rolling_transform(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_inner_extract(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_special_rolltrans(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_special_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_extract_roll(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_special_approach(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_diagonal_approach(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_alternate_fill(problem)
                 if i != -1:
                     return i
                 i = solve_by_misc(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 else:
                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
@@ -1547,33 +1627,47 @@ class Agent:
             else:
                 i = solve_by_reflection(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_pixel_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_offset(problem, 0)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_rolling(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_union(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_shift_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_simple_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_intersection(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_reverse_diff(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
-                i = solve_by_crop_union(problem)
+                i = solve_by_crop_union_a(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
+                    return i
+                i = solve_by_crop_union_b(problem)
+                if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 else:
                     print "Hmmm, this looks tricky. I would skip this problem." + "\n"
