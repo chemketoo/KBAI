@@ -313,7 +313,10 @@ def solve_by_reflection(problem):
                     option_diff = math.fabs(find_difference(transpose_c, option_image) - diff)
                     value_array.append(option_diff)
 
-                return value_array.index(min(value_array)) + 1
+                if min(value_array) < 5:
+                    return value_array.index(min(value_array)) + 1
+                else:
+                    return -1
             else:
                 transpose_g = image_g.transpose(Image.FLIP_LEFT_RIGHT)
                 for i in range(1, 9):
@@ -321,7 +324,10 @@ def solve_by_reflection(problem):
                     option_diff = math.fabs(find_difference(transpose_g, option_image) - diff)
                     value_array.append(option_diff)
 
-                return value_array.index(min(value_array)) + 1
+                if min(value_array) < 5:
+                    return value_array.index(min(value_array)) + 1
+                else:
+                    return -1
         else:
             return -1
 
@@ -572,7 +578,10 @@ def solve_by_general_scaling(problem):
                 diff_score = find_difference(result_final_transform, result_option)
                 diff_score_array.append(diff_score)
 
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 7:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
 
     except BaseException:
         pass
@@ -660,7 +669,11 @@ def solve_by_special_scaling(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(result_final_transform, result_option)
                 diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
 
     except BaseException:
         pass
@@ -696,7 +709,11 @@ def solve_by_rolling(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(final_transform, result_option)
                 diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
+
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
 
         return -1
     except BaseException:
@@ -740,7 +757,10 @@ def solve_by_rolling_transform(problem):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(sol_img, result_option)
                 diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
