@@ -340,8 +340,10 @@ def solve_by_pixel_diff(problem):
         else:
             image_diff = ImageChops.invert(ImageChops.difference(image_a, image_c))
             union = get_union(image_diff, image_a)
+            # union.show()
             diff = find_difference(union, image_c)
 
+        # print diff
         if diff <= 1:
             diff_score_array = []
             if problem.problemType == '2x2':
@@ -362,7 +364,7 @@ def solve_by_pixel_diff(problem):
                     result_option = Image.open(problem.figures[str(i)].visualFilename)
                     diff_score = find_difference(final_transform, result_option)
                     diff_score_array.append(diff_score)
-
+            # print diff_score_array
             if min(diff_score_array) < 1.5:
                 return diff_score_array.index(min(diff_score_array)) + 1
             else:
@@ -922,18 +924,27 @@ def solve_by_misc(problem):
 def solve_by_union(problem):
     try:
         a_union_b = get_union(image_a, image_b)
-        diff = find_difference(a_union_b, image_c)
+        # a_union_b.show()
+        diff_1 = find_difference(a_union_b, image_c)
+
+        d_union_e = get_union(image_d, image_e)
+        diff_2 = find_difference(d_union_e, image_f)
 
         g_union_h = get_union(image_g, image_h)
 
         diff_score_array = []
-        if diff < 1:
+        # print diff_1, diff_2
+        if diff_1 < 5 and diff_2 < 7:
             for i in range(1, 9):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(g_union_h, option_image)
                 diff_score_array.append(diff_score)
 
-            return diff_score_array.index(min(diff_score_array)) + 1
+            # print diff_score_array
+            if min(diff_score_array) < 6:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
         return -1
@@ -1510,10 +1521,10 @@ class Agent:
             if i != -1:
                 print 'Problem Solved' + "\n"
                 return i
-            i = solve_by_pixel_diff(problem)
-            if i != -1:
-                print 'Problem Solved' + "\n"
-                return i
+            # i = solve_by_pixel_diff(problem)
+            # if i != -1:
+            #     print 'Problem Solved' + "\n"
+            #     return i
             i = solve_by_decrease(problem, 0)
             if i != -1:
                 print 'Problem Solved' + "\n"
@@ -1570,10 +1581,10 @@ class Agent:
                 if i != -1:
                     print 'Problem Solved' + "\n"
                     return i
-                i = solve_by_pixel_diff(problem)
-                if i != -1:
-                    print 'Problem Solved' + "\n"
-                    return i
+                # i = solve_by_pixel_diff(problem)
+                # if i != -1:
+                #     print 'Problem Solved' + "\n"
+                #     return i
                 i = solve_by_offset(problem, 0)
                 if i != -1:
                     print 'Problem Solved' + "\n"
@@ -1630,10 +1641,11 @@ class Agent:
                 if i != -1:
                     print 'Problem Solved' + "\n"
                     return i
-                i = solve_by_pixel_diff(problem)
-                if i != -1:
-                    print 'Problem Solved' + "\n"
-                    return i
+                # i = solve_by_pixel_diff(problem)
+                # if i != -1:
+                #     print 'here'
+                #     print 'Problem Solved' + "\n"
+                #     return i
                 i = solve_by_offset(problem, 0)
                 if i != -1:
                     print 'Problem Solved' + "\n"
