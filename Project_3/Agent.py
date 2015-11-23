@@ -330,8 +330,6 @@ def solve_by_reflection(problem):
 
     return -1
 
-    # TODO: normal scaling
-
 
 def solve_by_pixel_diff(problem):
     try:
@@ -456,8 +454,10 @@ def solve_by_offset(problem, flag):
                 result_option = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(final_transform, result_option)
                 diff_score_array.append(diff_score)
-
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             if flag == 1:
                 return -1
@@ -1616,6 +1616,7 @@ class Agent:
                     return i
                 i = solve_by_alternate_fill(problem)
                 if i != -1:
+                    print 'Problem Solved' + "\n"
                     return i
                 i = solve_by_misc(problem)
                 if i != -1:
