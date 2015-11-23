@@ -815,7 +815,10 @@ def solve_by_special_rolltrans(problem):
                 sol_new = ImageChops.invert(ImageChops.difference(result_option, sol_intersect))
                 diff_score = find_difference(sol_img, sol_new)
                 diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
     except BaseException:
@@ -1059,7 +1062,10 @@ def solve_by_intersection(problem):
                 diff_score = find_difference(g_union_h, option_image)
                 diff_score_array.append(diff_score)
 
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
@@ -1110,7 +1116,10 @@ def solve_by_reverse_diff(problem):
                 option_image = Image.open(problem.figures[str(i)].visualFilename)
                 diff_score = find_difference(sol_new, option_image)
                 diff_score_array.append(diff_score)
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
@@ -1163,7 +1172,10 @@ def solve_by_crop_union_a(problem):
                 diff_score = find_difference(sol_new, option_image)
                 diff_score_array.append(diff_score)
 
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
@@ -1216,7 +1228,10 @@ def solve_by_crop_union_b(problem):
                 diff_score = find_difference(sol_new, option_image)
                 diff_score_array.append(diff_score)
 
-            return diff_score_array.index(min(diff_score_array)) + 1
+            if min(diff_score_array) < 5:
+                return diff_score_array.index(min(diff_score_array)) + 1
+            else:
+                return -1
         else:
             return -1
 
