@@ -7,7 +7,7 @@
 # def Solve(self,problem)
 #
 # These methods will be necessary for the project's main method to run.
-
+# __author__ = 'Bhanu Verma'
 # Install Pillow and uncomment this line to access image processing.
 
 from PIL import Image, ImageChops
